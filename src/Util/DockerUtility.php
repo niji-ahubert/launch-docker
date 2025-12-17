@@ -3,13 +3,13 @@
 namespace App\Util;
 
 use App\Enum\ContainerType\ProjectContainer;
-use App\Enum\ContainerType\ServiceContainer;
 use App\Model\DockerData;
 use App\Model\Project;
 use App\Model\Service\AbstractContainer;
 use App\Model\Service\ServiceContainerInterface;
 use Symfony\Component\Process\Process;
 
+/** @package App\Util */
 final readonly class DockerUtility
 {
 
@@ -17,7 +17,7 @@ final readonly class DockerUtility
     public static function getFinalTagName(Project $project, AbstractContainer $service): string
     {
         return \sprintf(
-            'project-%s-%s-%s-%s',
+            '%s-%s-%s-%s',
             $project->getClient(),
             $project->getProject(),
             $service->getFolderName(),
@@ -126,7 +126,7 @@ final readonly class DockerUtility
 
                 $projectServiceExtensions = $projectService->getExtensionsRequired();
                 if (null !== $projectServiceExtensions && isset($projectServiceExtensions[ProjectContainer::PHP->value])) {
-                    $extensions = [...$extensions, ...$projectServiceExtensions[ProjectContainer::PHP->value]];
+                    return [...$extensions, ...$projectServiceExtensions[ProjectContainer::PHP->value]];
                 }
 
                 return $extensions;

@@ -6,9 +6,7 @@ namespace App\Enum\Framework;
 
 
 /**
- * @template T as FrameworkLanguagePhp|FrameworkLanguageNode
- *
- * @return T
+ * @template-covariant T as FrameworkLanguagePhp|FrameworkLanguageNode
  */
 interface FrameworkLanguageInterface
 {

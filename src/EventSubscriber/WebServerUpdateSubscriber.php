@@ -7,10 +7,7 @@ namespace App\EventSubscriber;
 use App\Event\ServiceExternalRemoved;
 use App\Services\WebServerUpdateService;
 use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
 /**
  * Subscriber qui met à jour automatiquement le projet actuel
@@ -68,13 +65,13 @@ final readonly class WebServerUpdateSubscriber implements EventSubscriberInterfa
             );
 
 
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
 
 
             $this->logger->error('Erreur lors de la mise à jour des projets', [
                 'webserver' => $webServerName,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
+                'error' => $exception->getMessage(),
+                'trace' => $exception->getTraceAsString(),
             ]);
         }
     }

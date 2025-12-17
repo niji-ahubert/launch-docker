@@ -8,9 +8,6 @@ use App\Enum\WebServer;
 use App\Model\Project;
 use App\Model\Service\AbstractContainer;
 use App\Services\FileSystemEnvironmentServices;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Service pour mettre à jour les webservers des projets.
@@ -54,7 +51,7 @@ final readonly class WebServerUpdateService
                 $updatedProjects[] = sprintf('%s/%s', $project->getClient(), $project->getProject());
             }
 
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // En cas d'erreur, on retourne les statistiques vides
         }
 
@@ -71,7 +68,7 @@ final readonly class WebServerUpdateService
     {
         $webServer = $container->getWebServer();
 
-        if ($webServer === null) {
+        if (!$webServer instanceof \App\Model\Service\WebServer) {
             return false;
         }
 

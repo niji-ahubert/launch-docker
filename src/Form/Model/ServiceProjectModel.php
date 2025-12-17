@@ -54,7 +54,6 @@ class ServiceProjectModel
     private ?ProjectContainer $language = null;
 
     /**
-     * @var FrameworkLanguageInterface|null
      * @phpstan-var FrameworkLanguageInterface<FrameworkLanguagePhp|FrameworkLanguageNode>|null
      */
     private ?FrameworkLanguageInterface $framework = null;

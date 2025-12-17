@@ -13,7 +13,6 @@ use App\Services\FileSystemEnvironmentServices;
 use App\Services\Mercure\MercureService;
 use App\Services\ProcessRunnerService;
 use App\Strategy\Step\AbstractBuildServiceStepHandler;
-use App\Strategy\Step\AbstractServiceStepHandler;
 use App\Util\DockerUtility;
 use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Component\Filesystem\Filesystem;
@@ -21,15 +20,15 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Webmozart\Assert\Assert;
 
-final readonly class DockerFileServiceStepHandler extends AbstractBuildServiceStepHandler
+final class DockerFileServiceStepHandler extends AbstractBuildServiceStepHandler
 {
     private AbstractContainer $currentContainer;
 
     public function __construct(
-        private Filesystem            $filesystem,
+        private readonly Filesystem            $filesystem,
         FileSystemEnvironmentServices $fileSystemEnvironmentServices,
-        private Generator             $makerGenerator,
-        private NormalizerInterface   $serializer,
+        private readonly Generator             $makerGenerator,
+        private readonly NormalizerInterface   $serializer,
         MercureService                $mercureService,
         ProcessRunnerService          $processRunner,
 
@@ -94,7 +93,7 @@ final readonly class DockerFileServiceStepHandler extends AbstractBuildServiceSt
      * 3. Réinjecte le code personnalisé entre les balises dans le nouveau Dockerfile
      *
      * @param string $dockerfilePath Chemin du Dockerfile à mettre à jour
-     * @param array $variables Variables pour la génération du template
+     * @param array<string, mixed> $variables Variables pour la génération du template
      */
     private function updateDockerfile(string $dockerfilePath, array $variables): void
     {
@@ -137,7 +136,7 @@ final readonly class DockerFileServiceStepHandler extends AbstractBuildServiceSt
      * Crée un nouveau Dockerfile depuis le template.
      *
      * @param string $dockerfilePath Chemin du Dockerfile à créer
-     * @param array $variables Variables pour la génération du template
+     * @param array<string, mixed> $variables Variables pour la génération du template
      */
     private function createDockerfile(string $dockerfilePath, array $variables): void
     {
@@ -182,16 +181,9 @@ final readonly class DockerFileServiceStepHandler extends AbstractBuildServiceSt
 
     /**
      * Récupère le container actuellement traité (nécessaire pour getDockerSkeletonFile).
-     *
-     * @return AbstractContainer
-     * @throws \RuntimeException Si le container n'a pas été initialisé
      */
     private function getCurrentContainer(): AbstractContainer
     {
-        if ($this->currentContainer === null) {
-            throw new \RuntimeException('Container not initialized. Call __invoke() first.');
-        }
-
         return $this->currentContainer;
     }
 

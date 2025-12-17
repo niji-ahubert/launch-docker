@@ -8,10 +8,9 @@ use App\Enum\ApplicationStep;
 use App\Model\Project;
 use App\Model\Service\AbstractContainer;
 use App\Strategy\Step\AbstractBuildServiceStepHandler;
-use App\Strategy\Step\AbstractServiceStepHandler;
 use Monolog\Level;
 
-final readonly class ComposerInitServiceStepHandler extends AbstractBuildServiceStepHandler
+final class ComposerInitServiceStepHandler extends AbstractBuildServiceStepHandler
 {
     public function __invoke(AbstractContainer $serviceContainer, Project $project): void
     {

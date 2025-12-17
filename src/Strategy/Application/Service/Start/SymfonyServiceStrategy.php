@@ -23,10 +23,8 @@ final readonly class SymfonyServiceStrategy extends AbstractServiceStrategy
     public function getSteps(): array
     {
         return [
-
             ApplicationStep::COMPOSER,
             ApplicationStep::ACCESS_RIGHT,
-            ApplicationStep::ENTRYPOINT,
         ];
     }
 

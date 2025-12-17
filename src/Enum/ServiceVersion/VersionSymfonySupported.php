@@ -16,12 +16,16 @@ enum VersionSymfonySupported: string implements TranslatableInterface, VersionFr
 {
     use UtilityTrait;
 
+    case SF80 = '8.0x';
+    case SF74 = '7.4.x';
     case SF73 = '7.3.x';
     case SF64 = '6.4';
 
     public function trans(TranslatorInterface $translator, ?string $locale = null): string
     {
         return match ($this) {
+            self::SF80 => $translator->trans('version.symfony.8.0', locale: $locale),
+            self::SF74 => $translator->trans('version.symfony.7.4', locale: $locale),
             self::SF73 => $translator->trans('version.symfony.7.1', locale: $locale),
             self::SF64 => $translator->trans('version.symfony.6.4', locale: $locale),
         };

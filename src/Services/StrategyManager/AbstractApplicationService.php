@@ -10,10 +10,7 @@ use App\Enum\Log\TypeLog;
 use App\Model\Project;
 use App\Model\Service\AbstractContainer;
 use App\Services\Mercure\MercureService;
-use App\Strategy\Application\Service\AbstractServiceStrategy;
-use App\Strategy\Application\Service\Create\CreateApplicationInterface;
 use Monolog\Level;
-use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 /**
  * Service orchestrateur pour la création d'applications.
@@ -30,6 +27,7 @@ abstract class AbstractApplicationService
 {
 
     protected MercureService $mercureService;
+    /** @var iterable<\App\Strategy\Application\Service\AbstractServiceStrategy> */
     protected iterable $strategies;
 
 

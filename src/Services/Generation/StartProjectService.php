@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services\Generation;
 
 use App\Enum\ContainerType\ProjectContainer;
-use App\Enum\ContainerType\ServiceContainer;
 use App\Enum\Log\LoggerChannel;
 use App\Enum\Log\TypeLog;
 use App\Model\Project;
@@ -42,9 +41,9 @@ final readonly class StartProjectService
     {
     }
 
-    public function startProject(Project $project, bool $onlyProjectService = false): void
+    public function startProject(Project $project, bool $onlyProjectService = false, bool $detach = true): void
     {
-        $this->mercureService->initialize($project, LoggerChannel::BUILD);
+        $this->mercureService->initialize($project, LoggerChannel::START);
 
         $totalServices = \count($project->getServiceContainer());
         $startedServices = 0;
@@ -52,15 +51,16 @@ final readonly class StartProjectService
         foreach ($project->getServiceContainer() as $service) {
             try {
 
-                if ($onlyProjectService === true && $service->getServiceContainer() instanceof ServiceContainer) {
+                if (!$service->getServiceContainer() instanceof ProjectContainer) {
                     continue;
                 }
 
-                match (true) {
-                    $service->getServiceContainer() instanceof ProjectContainer => $this->startService($project, $service),
-                    $service->getServiceContainer() instanceof ServiceContainer => $this->startExternalServices($project, $service),
-                    default => null,
-                };
+                $this->startService($project, $service, $detach);
+                // match (true) {
+                //     $service->getServiceContainer() instanceof ProjectContainer => $this->startService($project, $service, $detach),
+                //     $service->getServiceContainer() instanceof ServiceContainer => $this->startExternalServices($project, $service, $detach),
+                //     default => null,
+                // };
                 $startedServices++;
             } catch (ProcessFailedException $e) {
 
@@ -80,28 +80,7 @@ final readonly class StartProjectService
         );
     }
 
-    private function startExternalServices(Project $project, AbstractContainer $service): void
-    {
-
-        $command = [
-            'docker',
-            '--log-level=ERROR',
-            'compose',
-            '--profile',
-            'runner-dev',
-            '--project-name',
-            DockerUtility::getProjectName($project),
-            '-f',
-            $this->fileSystemEnvironmentServices->getDockerComposeFilePath($project),
-            'up',
-            '--detach',
-            $service->getServiceContainer()->value
-        ];
-        $this->processRunnerService->run($command, '📦 Démarrage des services externes', $this->projectDir);
-
-    }
-
-    private function startService(Project $project, AbstractContainer $service): void
+    private function startService(Project $project, AbstractContainer $service, bool $detach = true): void
     {
 
         if (!$this->fileSystemEnvironmentServices->componentEnvFileExist($project, $service)) {
@@ -138,9 +117,13 @@ final readonly class StartProjectService
             '-f',
             $this->fileSystemEnvironmentServices->getDockerComposeFilePath($project),
             'up',
-            '--detach',
-            DockerComposeUtility::getProjectServiceName($project, $service)
         ];
+
+        if ($detach) {
+            $command[] = '--detach';
+        }
+
+      //  $command[] = DockerComposeUtility::getProjectServiceName($project, $service);
 
 
         $this->processRunnerService->run(

@@ -6,15 +6,12 @@ namespace App\Strategy\Step;
 
 use App\Enum\ApplicationStep;
 use App\Enum\DockerAction;
-use App\Model\Project;
-use App\Model\Service\AbstractContainer;
 use App\Services\FileSystemEnvironmentServices;
 use App\Services\Mercure\MercureService;
 use App\Services\ProcessRunnerService;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 
-abstract readonly class AbstractStepHandler
+abstract class AbstractStepHandler
 {
     public function __construct(protected FileSystemEnvironmentServices $fileSystemEnvironmentServices,
                                 protected MercureService                $mercureService,

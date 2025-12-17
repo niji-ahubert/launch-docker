@@ -13,20 +13,18 @@ use App\Services\Mercure\MercureService;
 use App\Services\ProcessRunnerService;
 use App\Services\StrategyManager\EnvFileGeneratorService;
 use App\Strategy\Step\AbstractBuildServiceStepHandler;
-use App\Strategy\Step\AbstractServiceStepHandler;
 use Symfony\Bundle\MakerBundle\Generator;
-use Symfony\Component\Filesystem\Filesystem;
 
-final readonly class EnvFileCreateServiceStepHandler extends AbstractBuildServiceStepHandler
+
+final class EnvFileDockerServiceStepHandler extends AbstractBuildServiceStepHandler
 {
     public function __construct(
         FileSystemEnvironmentServices   $fileSystemEnvironmentServices,
-        private Generator               $makerGenerator,
-        private EnvFileGeneratorService $envFileGeneratorService,
+        private readonly Generator               $makerGenerator,
+        private readonly EnvFileGeneratorService $envFileGeneratorService,
         MercureService                  $mercureService,
         ProcessRunnerService            $processRunner,
-        private Filesystem              $filesystem,
-        private string                  $projectDir,
+
     )
     {
         parent::__construct($fileSystemEnvironmentServices, $mercureService, $processRunner);
@@ -39,12 +37,6 @@ final readonly class EnvFileCreateServiceStepHandler extends AbstractBuildServic
             message: '📦 Création mise à jour des .env',
             type: TypeLog::START
         );
-
-        $this->filesystem->copy(sprintf('%s/%s', $this->projectDir, FileSystemEnvironmentServices::BIN_ENTRYPOINT_ADDON_SH), $this->fileSystemEnvironmentServices->getProjectComponentEntrypointAddonPath($project, $serviceContainer));
-
-        if ($this->filesystem->exists(sprintf('%s/.env', $this->projectDir))) {
-            $this->filesystem->copy(sprintf('%s/.env', $this->projectDir), sprintf('%s/.env.niji-launcher', $this->projectDir));
-        }
 
         $configPath = $this->fileSystemEnvironmentServices->getConfigPath($project);
 

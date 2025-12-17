@@ -11,20 +11,19 @@ use App\Services\FileSystemEnvironmentServices;
 use App\Services\Mercure\MercureService;
 use App\Services\ProcessRunnerService;
 use App\Strategy\Step\AbstractBuildServiceStepHandler;
-use App\Strategy\Step\AbstractServiceStepHandler;
 use Monolog\Level;
 use Symfony\Component\Filesystem\Filesystem;
 
-final readonly class GitCloneServiceStepHandler extends AbstractBuildServiceStepHandler
+final class GitCloneServiceStepHandler extends AbstractBuildServiceStepHandler
 {
-    public const MAIN_GIT_BRANCH = 'main';
+    public const string MAIN_GIT_BRANCH = 'main';
 
     public function __construct(
-        private Filesystem            $filesystem,
+        private readonly Filesystem            $filesystem,
         FileSystemEnvironmentServices $fileSystemEnvironmentServices,
         MercureService                $mercureService,
         ProcessRunnerService          $processRunner,
-        private string                $projectDir
+        private readonly string                $projectDir
     )
     {
         parent::__construct($fileSystemEnvironmentServices, $mercureService, $processRunner);

@@ -2,6 +2,7 @@
 
 namespace App\Util;
 
+use App\Model\Service\AbstractFramework;
 use App\Enum\ContainerType\ProjectContainer;
 use App\Enum\Environment;
 use App\Enum\Framework\FrameworkLanguagePhp;
@@ -25,7 +26,7 @@ final readonly class ServiceContainerUtility
         }
 
         $framework = $service->getFramework();
-        if (null === $framework) {
+        if (!$framework instanceof AbstractFramework) {
             return false;
         }
 

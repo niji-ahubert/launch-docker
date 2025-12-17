@@ -120,7 +120,7 @@ class ProjectLoggerService
     {
         $deleted = 0;
 
-        if ($channel === null) {
+        if (!$channel instanceof LoggerChannel) {
             $channels = $this->getAvailableChannels($project);
             foreach ($channels as $enumChannel) {
                 if ($this->deleteLogFile($project, $enumChannel)) {
@@ -129,7 +129,7 @@ class ProjectLoggerService
                     unset($this->loggers[$loggerKey]);
                 }
             }
-        } else if ($this->deleteLogFile($project, $channel)) {
+        } elseif ($this->deleteLogFile($project, $channel)) {
             $deleted++;
             $loggerKey = $this->getLoggerKey($project, $channel);
             unset($this->loggers[$loggerKey]);

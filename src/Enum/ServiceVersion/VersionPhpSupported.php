@@ -15,6 +15,8 @@ enum VersionPhpSupported: string implements TranslatableInterface, VersionServic
 {
     use UtilityTrait;
 
+    case PHP85 = '8.5';
+    case PHP84 = '8.4';
     case PHP83 = '8.3';
     case PHP82 = '8.2';
     case PHP81 = '8.1';
@@ -22,6 +24,8 @@ enum VersionPhpSupported: string implements TranslatableInterface, VersionServic
     public function trans(TranslatorInterface $translator, ?string $locale = null): string
     {
         return match ($this) {
+            self::PHP85 => $translator->trans('version.php.8.5', locale: $locale),
+            self::PHP84 => $translator->trans('version.php.8.4', locale: $locale),
             self::PHP83 => $translator->trans('version.php.8.3', locale: $locale),
             self::PHP82 => $translator->trans('version.php.8.2', locale: $locale),
             self::PHP81 => $translator->trans('version.php.8.1', locale: $locale),

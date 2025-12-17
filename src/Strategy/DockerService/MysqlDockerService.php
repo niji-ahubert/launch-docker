@@ -12,23 +12,23 @@ use App\Services\FileSystemEnvironmentServices;
 use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-final readonly class MysqlDockerService extends AbstractDockerService
+final readonly class MysqlDockerService extends AbstractDatabaseDockerService
 {
     public function __construct(
         #[Autowire(param: 'bdd.root_password')]
-        private string                $rootPassword,
+        string                        $rootPassword,
         #[Autowire(param: 'bdd.database')]
-        private string                $database,
+        string                        $database,
         #[Autowire(param: 'bdd.user')]
-        private string                $dbUser,
+        string                        $dbUser,
         #[Autowire(param: 'bdd.password')]
-        private string                $dbPassword,
+        string                        $dbPassword,
         DockerComposeFile             $dockerComposeFile,
         Generator                     $makerGenerator,
         FileSystemEnvironmentServices $fileSystemEnvironmentServices,
     )
     {
-        parent::__construct($dockerComposeFile, $makerGenerator, $fileSystemEnvironmentServices);
+        parent::__construct($rootPassword, $database, $dbUser, $dbPassword, $dockerComposeFile, $makerGenerator, $fileSystemEnvironmentServices);
     }
 
     public function support(AbstractContainer $service): bool
@@ -37,7 +37,7 @@ final readonly class MysqlDockerService extends AbstractDockerService
     }
 
     #[\Override]
-    protected function getDefaultPorts(AbstractContainer $service): array
+    public function getDefaultPorts(AbstractContainer $service): array
     {
         return ['3306'];
     }
@@ -58,5 +58,10 @@ final readonly class MysqlDockerService extends AbstractDockerService
                 'MYSQL_PASSWORD' => $this->dbPassword,
             ],
         ];
+    }
+
+    public function getDsnProtocol(): string
+    {
+        return ServiceContainer::MYSQL->value;
     }
 }

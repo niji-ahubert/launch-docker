@@ -10,7 +10,7 @@ use App\Model\Project;
 use App\Model\Service\AbstractContainer;
 use App\Strategy\Step\AbstractStartServiceStepHandler;
 
-final readonly class ComposerInstallServiceStepHandler extends AbstractStartServiceStepHandler
+final class ComposerInstallServiceStepHandler extends AbstractStartServiceStepHandler
 {
 
     public function __invoke(AbstractContainer $serviceContainer, Project $project): void

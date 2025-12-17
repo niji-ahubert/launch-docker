@@ -9,7 +9,6 @@ use App\Form\Model\FormModel;
 use App\Form\Model\ServiceExternalModel;
 use App\Form\Model\ServiceProjectModel;
 use App\Model\Project;
-use App\Model\Service\AbstractContainer;
 use App\Services\FileSystemEnvironmentServices;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
@@ -33,7 +32,7 @@ final readonly class FormServiceService
 
     public function saveService(TypeService $typeService, Project $loadedProject, ServiceExternalModel|ServiceProjectModel $model): void
     {
-        $serviceContainer = $this->getModelService($typeService)->transform($model, $loadedProject);
+        $serviceContainer = $this->getModelService($typeService)->transform($model);
         $loadedProject->removeServiceContainer($serviceContainer);
         $loadedProject->addServiceContainer($serviceContainer);
 
@@ -42,7 +41,7 @@ final readonly class FormServiceService
 
     public function removeService(TypeService $typeService, Project $loadedProject, ServiceExternalModel|ServiceProjectModel $model): void
     {
-        $serviceContainer = $this->getModelService($typeService)->transform($model, $loadedProject);
+        $serviceContainer = $this->getModelService($typeService)->transform($model);
         $loadedProject->removeServiceContainer($serviceContainer);
 
         $this->environmentServices->saveEnvironments($loadedProject);

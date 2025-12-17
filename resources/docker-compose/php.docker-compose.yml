@@ -7,7 +7,7 @@ volumes:
 services:
   php-dev:
     container_name: ${CLIENT}-${PROJECT}-${FOLDER_NAME}-${DOCKER_ENV}
-    image: project-${CLIENT}-${PROJECT}-${FOLDER_NAME}-${DOCKER_ENV}
+    image: ${CLIENT}-${PROJECT}-${FOLDER_NAME}-${DOCKER_ENV}
     user: ${HOST_UID:-1000}
     profiles:
       - runner-dev
@@ -43,7 +43,7 @@ services:
   php-prod:
     profiles:
       - runner-dev
-    image: project-${CLIENT}-${PROJECT}-${FOLDER_NAME}-${DOCKER_ENV}:${TAG_VERSION:-latest}
+    image: ${CLIENT}-${PROJECT}-${FOLDER_NAME}-${DOCKER_ENV}:${TAG_VERSION:-latest}
     env_file: "./projects/${CLIENT}/${PROJECT}/config/${FOLDER_NAME}.env"
     networks:
       - traefik

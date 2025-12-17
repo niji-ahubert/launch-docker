@@ -11,7 +11,6 @@ use App\Model\Service\AbstractContainer;
 use App\Services\StrategyManager\StepServiceManagerService;
 use App\Strategy\Application\Service\Create\CreateApplicationInterface;
 use App\Strategy\Application\Service\Start\StartApplicationInterface;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
  * Stratégie de création de projet Symfony.

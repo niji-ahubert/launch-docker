@@ -12,14 +12,13 @@ use App\Services\FileSystemEnvironmentServices;
 use App\Services\Mercure\MercureService;
 use App\Services\ProcessRunnerService;
 use App\Strategy\Step\AbstractBuildServiceStepHandler;
-use App\Strategy\Step\AbstractServiceStepHandler;
 
-final readonly class AccessRightServiceStepHandler extends AbstractBuildServiceStepHandler
+final class AccessRightServiceStepHandler extends AbstractBuildServiceStepHandler
 {
     public function __construct(FileSystemEnvironmentServices $fileSystemEnvironmentServices,
                                 MercureService                $mercureService,
                                 ProcessRunnerService          $processRunner,
-                                private ProcessRunnerService  $processRunnerService)
+                                private readonly ProcessRunnerService  $processRunnerService)
     {
         parent::__construct($fileSystemEnvironmentServices, $mercureService, $processRunner);
     }

@@ -12,7 +12,9 @@ parameters:
   bdd.database: 'main'
   bdd.user: 'user_bdd'
   bdd.password: '!ChangeMe!'
-
+  default_uid: '1000'
+  default_gid: '1000'
+  
 services:
   # default configuration for services in *this* file
   _defaults:
@@ -21,7 +23,9 @@ services:
     bind:
       $makerGenerator: '@maker.generator'
       string $projectDir: '%kernel.project_dir%'
-
+      string $hostUid: '%env(default:default_uid:HOST_UID)%'
+      string $hostGid: '%env(default:default_gid:HOST_GID)%'
+      string $projectRoot: '%env(PROJECT_ROOT)%'
 
   # makes classes in src/ available to be used as services
   # this creates a service per class whose id is the fully-qualified class name

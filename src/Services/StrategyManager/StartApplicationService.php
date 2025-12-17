@@ -4,16 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services\StrategyManager;
 
-use App\Enum\DockerAction;
-use App\Enum\Log\LoggerChannel;
-use App\Enum\Log\TypeLog;
-use App\Model\Project;
-use App\Model\Service\AbstractContainer;
 use App\Services\Mercure\MercureService;
 use App\Strategy\Application\Service\AbstractServiceStrategy;
-use App\Strategy\Application\Service\Create\CreateApplicationInterface;
 use App\Strategy\Application\Service\Start\StartApplicationInterface;
-use Monolog\Level;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 

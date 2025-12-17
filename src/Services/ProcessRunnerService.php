@@ -47,7 +47,7 @@ final readonly class ProcessRunnerService
         $process->setTimeout(null);
         $process->setIdleTimeout(60);
 
-        $process->run(function ($type, $buffer) {
+        $process->run(function ($type, $buffer): void {
             $primaryChunks = preg_split("/(\r\n|\r|\n)/", (string)$buffer) ?: [];
 
             foreach ($primaryChunks as $chunk) {

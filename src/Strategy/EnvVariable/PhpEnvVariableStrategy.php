@@ -31,10 +31,11 @@ class PhpEnvVariableStrategy extends AbstractEnvVariableStrategy
     public function generateVariables(AbstractContainer $serviceContainer, Project $project): array
     {
         $commonVariables = $this->getCommonVariables($serviceContainer, $project);
+        $extensions = $serviceContainer->getExtensionsRequired();
 
         $phpVariables = [
             'PHP_VERSION' => $serviceContainer->getDockerVersionService() ?? throw new \Exception('Version de Docker non définie'),
-            'PHP_EXTENSIONS' => implode(',', $serviceContainer->getExtensionsRequired() ?? []),
+            'PHP_EXTENSIONS' => implode(',', $extensions[ProjectContainer::PHP->value] ?? []),
             'TAG_VERSION' => 'latest',
         ];
 

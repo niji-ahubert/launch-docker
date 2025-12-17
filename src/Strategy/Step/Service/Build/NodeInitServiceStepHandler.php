@@ -9,10 +9,9 @@ use App\Enum\Log\TypeLog;
 use App\Model\Project;
 use App\Model\Service\AbstractContainer;
 use App\Strategy\Step\AbstractBuildServiceStepHandler;
-use App\Strategy\Step\AbstractServiceStepHandler;
 use Monolog\Level;
 
-final readonly class NodeInitServiceStepHandler extends AbstractBuildServiceStepHandler
+final class NodeInitServiceStepHandler extends AbstractBuildServiceStepHandler
 {
     /**
      * @throws \JsonException

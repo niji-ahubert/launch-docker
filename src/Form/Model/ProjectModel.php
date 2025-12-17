@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[CustomAssert\UniqueClientProject(groups: ['Default', 'Project'])]
 class ProjectModel
 {
-    private Uuid $id;
+    private readonly Uuid $id;
 
     #[Assert\NotBlank(groups: ['Default', 'Project'])]
     private ?string $client = null;

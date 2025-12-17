@@ -10,7 +10,6 @@ use App\Services\Logging\ProjectLoggerService;
 use App\Services\Mercure\MercureService;
 use Monolog\Level;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
@@ -24,8 +23,6 @@ use Symfony\Component\Mercure\Update;
  */
 final readonly class MercurePublisherSubscriber implements EventSubscriberInterface
 {
-    private OutputFormatter $outputFormatter;
-
     public function __construct(
         private HubInterface         $hub,
         private ProjectLoggerService $projectLoggerService
@@ -98,16 +95,16 @@ final readonly class MercurePublisherSubscriber implements EventSubscriberInterf
             </turbo-stream>',
             htmlspecialchars(MercureService::TARGET_ID, ENT_QUOTES, 'UTF-8'),
             htmlspecialchars($this->getCssClassForLine($message), ENT_QUOTES, 'UTF-8'),
-            htmlspecialchars(preg_replace('/\e\[[0-9;]*m/', '', $message->getMessage()), ENT_QUOTES, 'UTF-8')
+            htmlspecialchars((string) preg_replace('/\e\[[0-9;]*m/', '', $message->getMessage()), ENT_QUOTES, 'UTF-8')
         );
 
         $update = new Update(MercureService::MERCURE_TOPIC, $turboStreamContent);
 
         try {
             $this->hub->publish($update);
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             $logger->error('Erreur lors de la publication Mercure', [
-                'error' => $e->getMessage(),
+                'error' => $exception->getMessage(),
                 'message' => $message,
             ]);
         }

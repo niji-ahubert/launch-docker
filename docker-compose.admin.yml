@@ -10,8 +10,7 @@ volumes:
   phpstan-cache:
   rector-cache:
   mercure_data:
-  mercure_config:
-# Configuration commune pour les services PHP
+  mercure_config: # Configuration commune pour les services PHP
 x-php-common: &php-common
   user: ${CURRENT_UID:-1000}
   volumes:

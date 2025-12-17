@@ -12,21 +12,21 @@ use App\Services\FileSystemEnvironmentServices;
 use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-final readonly class PostgresqlDockerService extends AbstractDockerService
+final readonly class PostgresqlDockerService extends AbstractDatabaseDockerService
 {
     public function __construct(
         #[Autowire(param: 'bdd.root_password')]
-        private string                $rootPassword,
+        string                        $rootPassword,
         #[Autowire(param: 'bdd.database')]
-        private string                $database,
+        string                        $database,
         #[Autowire(param: 'bdd.user')]
-        private string                $dbUser,
+        string                        $dbUser,
         DockerComposeFile             $dockerComposeFile,
         Generator                     $makerGenerator,
         FileSystemEnvironmentServices $fileSystemEnvironmentServices,
     )
     {
-        parent::__construct($dockerComposeFile, $makerGenerator, $fileSystemEnvironmentServices);
+        parent::__construct($rootPassword, $database, $dbUser, $rootPassword, $dockerComposeFile, $makerGenerator, $fileSystemEnvironmentServices);
     }
 
 
@@ -36,7 +36,7 @@ final readonly class PostgresqlDockerService extends AbstractDockerService
     }
 
     #[\Override]
-    protected function getDefaultPorts(AbstractContainer $service): array
+    public function getDefaultPorts(AbstractContainer $service): array
     {
         return ['5432'];
     }
@@ -57,4 +57,16 @@ final readonly class PostgresqlDockerService extends AbstractDockerService
             ],
         ];
     }
+
+    public function getDsnProtocol(): string
+    {
+        return ServiceContainer::PGSQL->value;
+    }
+
+    #[\Override]
+    public function getConnectionPassword(): string
+    {
+        return $this->rootPassword;
+    }
+    
 }

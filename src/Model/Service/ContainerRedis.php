@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Model\Service;
 
+use App\Enum\ContainerType\ProjectContainer;
 use App\Enum\ContainerType\ServiceContainer;
 use App\Enum\PhpExtension;
 use App\Enum\ServiceVersion\VersionRedisSupported;
@@ -18,7 +19,7 @@ final class ContainerRedis extends AbstractContainer implements ServiceContainer
     {
         $this->versionSupported = VersionRedisSupported::values();
         $this->serviceContainer = ServiceContainer::REDIS;
-        $this->extensionsRequired = [PhpExtension::REDIS->value];
+        $this->extensionsRequired = [ProjectContainer::PHP->value => [PhpExtension::REDIS->value]];
         $this->dockerServiceName = 'redis';
         $this->dockerVersionService = VersionRedisSupported::REDIS7->value;
         parent::__construct();

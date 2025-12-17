@@ -55,7 +55,7 @@ abstract class AbstractContainer implements \Stringable
     /** @var string[]|null */
     protected ?array $webserverSupported = null;
 
-    /** @var string[]|null */
+    /** @var array<string, string[]>|null */
     protected ?array $extensionsRequired = [];
 
     /** @var string[]|null */
@@ -91,11 +91,17 @@ abstract class AbstractContainer implements \Stringable
         return $this->serviceContainer->value;
     }
 
+    /**
+     * @return DataStorage[]|null
+     */
     public function getDataStorages(): ?array
     {
         return $this->dataStorages;
     }
 
+    /**
+     * @param DataStorage[]|null $dataStorages
+     */
     public function setDataStorages(?array $dataStorages): AbstractContainer
     {
         $this->dataStorages = $dataStorages;
@@ -105,7 +111,6 @@ abstract class AbstractContainer implements \Stringable
     abstract public function getFormType(): string;
 
     /**
-     * @return VersionServiceSupportedInterface|null
      * @phpstan-return VersionServiceSupportedInterface<VersionMariadbSupported|VersionMysqlSupported|VersionNginxSupported|VersionNodeSupported|VersionPgsqlSupported|VersionPhpSupported|VersionRedisSupported>|null
      */
     abstract public function getVersionServiceEnum(): ?VersionServiceSupportedInterface;
@@ -175,13 +180,13 @@ abstract class AbstractContainer implements \Stringable
         return $this->serviceContainer::tryFrom($serviceContainer) === $this->getServiceContainer();
     }
 
-    /** @return string[]|null */
+    /** @return array<string, string[]>|null */
     public function getExtensionsRequired(): ?array
     {
         return $this->extensionsRequired;
     }
 
-    /** @param string[]|null $extensionsRequired */
+    /** @param array<string, string[]>|null $extensionsRequired */
     public function setExtensionsRequired(?array $extensionsRequired): self
     {
         $this->extensionsRequired = $extensionsRequired;

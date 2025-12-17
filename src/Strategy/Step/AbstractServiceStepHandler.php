@@ -9,7 +9,7 @@ use App\Model\Service\AbstractContainer;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag(self::APP_STEP_HANDLER)]
-abstract readonly class AbstractServiceStepHandler extends AbstractStepHandler
+abstract class AbstractServiceStepHandler extends AbstractStepHandler
 {
     public const APP_STEP_HANDLER = 'app.step_handler';
 

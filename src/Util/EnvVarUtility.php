@@ -5,7 +5,6 @@ namespace App\Util;
 final readonly class EnvVarUtility
 {
     /**
-     * @param string $envFile
      * @return array<string, string|int>
      */
     public static function loadEnvironmentVariables(string $envFile): array

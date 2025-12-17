@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace App\Form\DataTransformer;
 
 use App\Enum\ContainerType\ProjectContainer;
-use App\Enum\DataStorage;
 use App\Enum\Framework\FrameworkLanguageInterface;
 use App\Enum\Framework\FrameworkLanguageNode;
 use App\Enum\Framework\FrameworkLanguagePhp;
 use App\Enum\ServiceVersion\VersionFrameworkSupportedInterface;
 use App\Enum\ServiceVersion\VersionServiceSupportedInterface;
-use App\Enum\WebServer;
 use App\Form\Model\ServiceProjectModel;
 use App\Model\Project;
 use App\Model\Service\AbstractContainer;
@@ -57,7 +55,7 @@ readonly class ServiceProjectModelToProjectTransformer
         }
 
         $projectContainer->setFolderName($model->getFolderName());
-        $projectContainer->setExtensionsRequired($model->getExtensionsRequired());
+        $projectContainer->setExtensionsRequired($model->getExtensionsRequired() ? [ProjectContainer::PHP->value => $model->getExtensionsRequired()] : []);
         $projectContainer->setUrlService($model->getUrlService());
         $projectContainer->setWebServer($this->webServerServices->getWebserver($model));
         $projectContainer->setGithubRepository($model->getGithubRepository());
@@ -100,7 +98,8 @@ readonly class ServiceProjectModelToProjectTransformer
             }
             $model->setId($container->getId());
             $model->setFolderName($container->getFolderName());
-            $model->setExtensionsRequired($container->getExtensionsRequired());
+            $extensions = $container->getExtensionsRequired();
+            $model->setExtensionsRequired($extensions[ProjectContainer::PHP->value] ?? []);
             $model->setUrlService($container->getUrlService());
             $webServerEnum = $container->getWebServer()?->getWebServer();
             $model->setWebServer($webServerEnum);

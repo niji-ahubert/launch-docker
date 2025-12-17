@@ -12,17 +12,16 @@ use App\Services\FileSystemEnvironmentServices;
 use App\Services\Mercure\MercureService;
 use App\Services\ProcessRunnerService;
 use App\Strategy\Step\AbstractBuildServiceStepHandler;
-use App\Strategy\Step\AbstractServiceStepHandler;
 use Symfony\Bundle\MakerBundle\Generator;
 use Webmozart\Assert\Assert;
 
-final readonly class StartPagePhpServiceStepHandler extends AbstractBuildServiceStepHandler
+final class StartPagePhpServiceStepHandler extends AbstractBuildServiceStepHandler
 {
     public function __construct(
         FileSystemEnvironmentServices $fileSystemEnvironmentServices,
         MercureService                $mercureService,
         ProcessRunnerService          $processRunner,
-        private Generator             $makerGenerator
+        private readonly Generator             $makerGenerator
     )
     {
         parent::__construct($fileSystemEnvironmentServices, $mercureService, $processRunner);

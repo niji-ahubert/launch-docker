@@ -16,23 +16,23 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 final class FileSystemEnvironmentServices
 {
-    public const  CONFIG_FOLDER = 'config';
-    public const  SOCLE_ENV = 'socle.json';
-    public const DOCKERFILE_NAME = 'LauncherDockerfile';
-    public const DOCKER_COMPOSE_FILE_NAME = 'launcher-docker-compose.yml';
+    public const string  CONFIG_FOLDER = 'config';
+    public const string  SOCLE_ENV = 'socle.json';
+    public const string DOCKERFILE_NAME = 'LauncherDockerfile';
+    public const string DOCKER_COMPOSE_FILE_NAME = 'launcher-docker-compose.yml';
 
 
-    public const PROJECT_IN_GENERATOR_ROOT_DIRECTORY = '/var/www/html/projects';
-    public const NGINX_CONFIG_NAME = 'nginx.conf';
+    public const string PROJECT_IN_GENERATOR_ROOT_DIRECTORY = '/var/www/html/projects';
+    public const string NGINX_CONFIG_NAME = 'nginx.conf';
 
-    public const EXT_LOG = '.log';
-    private const   LOG_FILE_PATTERN = '%s' . self::EXT_LOG;
-    public const  LOGS_FOLDER = 'logs';
-    public const  DOCKER_FOLDER = 'docker';
-    public const SRC_RESOURCES_SKELETON = 'src/Resources/skeleton';
+    public const string EXT_LOG = '.log';
+    private const string   LOG_FILE_PATTERN = '%s' . self::EXT_LOG;
+    public const string  LOGS_FOLDER = 'logs';
+    public const string  DOCKER_FOLDER = 'docker';
+    public const string SRC_RESOURCES_SKELETON = 'src/Resources/skeleton';
 
-    public const SRC_RESOURCES_SKELETON_DOCKERFILE = self::SRC_RESOURCES_SKELETON . '/dockerfile';
-    public const BIN_ENTRYPOINT_ADDON_SH = 'bin/entrypoint-addon.sh';
+    public const string SRC_RESOURCES_SKELETON_DOCKERFILE = self::SRC_RESOURCES_SKELETON . '/dockerfile';
+    public const string BIN_ENTRYPOINT_ADDON_SH = 'bin/entrypoint-addon.sh';
     private readonly Finder $finder;
 
     private ?string $pathProject = null;
@@ -284,7 +284,7 @@ final class FileSystemEnvironmentServices
 
     public function getLogFilePath(Project $projectEnvironment, ?LoggerChannel $channel = null): string
     {
-        if (null === $channel) {
+        if (!$channel instanceof LoggerChannel) {
             return \sprintf('%s/%s', $this->getPathProject($projectEnvironment), self::LOGS_FOLDER);
         }
 

@@ -7,21 +7,13 @@ namespace App\Strategy\Step\Service\Start;
 use App\Enum\ApplicationStep;
 use App\Model\Project;
 use App\Model\Service\AbstractContainer;
-use App\Services\FileSystemEnvironmentServices;
-use App\Services\Mercure\MercureService;
-use App\Services\ProcessRunnerService;
 use App\Strategy\Step\AbstractStartServiceStepHandler;
 use Symfony\Component\Filesystem\Filesystem;
 
-final readonly class PhpQualityServiceStepHandler extends AbstractStartServiceStepHandler
+final class PhpQualityServiceStepHandler extends AbstractStartServiceStepHandler
 {
-    public function __construct(FileSystemEnvironmentServices $fileSystemEnvironmentServices,
-                                MercureService                $mercureService,
-                                ProcessRunnerService          $processRunner,
-                                private Filesystem            $filesystem,
-                                string                        $projectDir)
+    public function __construct(private readonly Filesystem            $filesystem)
     {
-        parent::__construct($fileSystemEnvironmentServices, $mercureService, $processRunner, $projectDir);
     }
 
     public function __invoke(AbstractContainer $serviceContainer, Project $project): void

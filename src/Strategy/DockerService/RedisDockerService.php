@@ -16,7 +16,7 @@ final readonly class RedisDockerService extends AbstractDockerService
     }
 
     #[\Override]
-    protected function getDefaultPorts(AbstractContainer $service): array
+    public function getDefaultPorts(AbstractContainer $service): array
     {
         return ['6379'];
     }

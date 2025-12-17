@@ -8,9 +8,8 @@ use App\Enum\ContainerType\ServiceContainer;
 use App\Enum\WebServer;
 use App\Model\Project;
 use App\Model\Service\AbstractContainer;
-use App\Services\DockerCompose\DockerComposeFile;
+use App\Util\DockerComposeUtility;
 use App\Services\FileSystemEnvironmentServices;
-use Symfony\Bundle\MakerBundle\Generator;
 
 final readonly class NginxDockerService extends AbstractDockerService
 {
@@ -21,15 +20,16 @@ final readonly class NginxDockerService extends AbstractDockerService
     }
 
     #[\Override]
-    protected function getDefaultPorts(AbstractContainer $service): array
+    public function getDefaultPorts(AbstractContainer $service): array
     {
         return ['9000'];
     }
 
     protected function getServiceSkeleton(string $volumeName, AbstractContainer $service, Project $project): array
     {
+        $dependsOn = DockerComposeUtility::getContainerWebserver($project, WebServer::NGINX);
 
-        return [
+        $serviceSkeleton = [
             'image' => \sprintf('%s:%s', ServiceContainer::NGINX->getValue(), $service->getDockerVersionService()),
             'container_name' => sprintf('%s_service', ServiceContainer::NGINX->getValue()),
             'volumes' => [
@@ -39,20 +39,28 @@ final readonly class NginxDockerService extends AbstractDockerService
             ],
             'profiles' => ['runner-dev'],
             'networks' => ['traefik'],
-            'labels' => [
-                'traefik.enable=true',
-                'traefik.docker.network=public-dev',
-                sprintf('traefik.http.routers.%s-%s-nginx.tls=true', $project->getClient(), $project->getProject()),
-                ...$this->extractUrl($project)
-            ],
         ];
 
+        if ($dependsOn !== []) {
+            $serviceSkeleton['depends_on'] = $dependsOn;
+        }
 
+        $serviceSkeleton['labels'] = [
+            'traefik.enable=true',
+            'traefik.docker.network=public-dev',
+            sprintf('traefik.http.routers.%s-%s-nginx.tls=true', $project->getClient(), $project->getProject()),
+            ...$this->extractUrl($project)
+        ];
+
+        return $serviceSkeleton;
     }
 
-    private function extractProjectVolume(Project $project): ?array
+    /**
+     * @return string[]
+     */
+    private function extractProjectVolume(Project $project): array
     {
-        $volumes = null;
+        $volumes = [];
 
         foreach ($project->getServiceContainer() as $container) {
 
@@ -65,6 +73,9 @@ final readonly class NginxDockerService extends AbstractDockerService
         return $volumes;
     }
 
+    /**
+     * @return string[]
+     */
     private function extractUrl(Project $project): array
     {
         $hosts = [];
@@ -78,7 +89,7 @@ final readonly class NginxDockerService extends AbstractDockerService
             }
         }
 
-        if (empty($hosts)) {
+        if ($hosts === []) {
             return [];
         }
 

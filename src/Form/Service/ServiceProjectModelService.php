@@ -41,7 +41,7 @@ final readonly class ServiceProjectModelService
         return new FormModel($serviceModel, $formType, $option);
     }
 
-    public function transform(ServiceProjectModel $model, Project $loadedProject): AbstractContainer
+    public function transform(ServiceProjectModel $model): AbstractContainer
     {
         return $this->serviceProjectModelTransformer->transform($model);
     }

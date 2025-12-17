@@ -9,7 +9,7 @@ use App\Model\Project;
 use App\Model\Service\AbstractContainer;
 use App\Strategy\Step\AbstractStartServiceStepHandler;
 
-final readonly class PhpQualitySymfonyServiceStepHandler extends AbstractStartServiceStepHandler
+final class PhpQualitySymfonyServiceStepHandler extends AbstractStartServiceStepHandler
 {
 
     public function __invoke(AbstractContainer $serviceContainer, Project $project): void

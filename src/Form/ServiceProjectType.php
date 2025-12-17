@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Form;
 
 use App\Enum\ContainerType\ProjectContainer;
-use App\Enum\DataStorage;
 use App\Enum\Framework\FrameworkLanguageInterface;
 use App\Enum\Framework\FrameworkLanguageNode;
 use App\Enum\Framework\FrameworkLanguagePhp;
@@ -88,6 +87,7 @@ class ServiceProjectType extends AbstractType
             ]);
 
         $project = $options['project'];
+        /** @var Project $project */
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($project): void {
             $data = $event->getData();
@@ -131,7 +131,7 @@ class ServiceProjectType extends AbstractType
 
     /**
      * @param FormInterface<ServiceProjectModel> $form
-     * @phpstan-param FrameworkLanguageInterface<FrameworkLanguagePhp|FrameworkLanguageNode> $framework
+     * @param FrameworkLanguageInterface<FrameworkLanguagePhp|FrameworkLanguageNode>|null $framework
      */
     private function addDynamicFields(
         FormInterface               $form,
@@ -145,7 +145,7 @@ class ServiceProjectType extends AbstractType
         $this->addFrameworkField($form, $language);
         $this->addVersionFrameworkField($form, $framework);
         $this->addExtensionsField($form, $language);
-        $this->addWebServerField($form, $webserver);
+        $this->addWebServerField($form);
         $this->addDataStorageField($form, $project);
     }
 
@@ -194,7 +194,7 @@ class ServiceProjectType extends AbstractType
 
     /**
      * @param FormInterface<ServiceProjectModel> $form
-     * @phpstan-param FrameworkLanguageInterface<FrameworkLanguagePhp|FrameworkLanguageNode> $framework
+     * @param FrameworkLanguageInterface<FrameworkLanguagePhp|FrameworkLanguageNode>|null $framework
      */
     private function addVersionFrameworkField(FormInterface $form, ?FrameworkLanguageInterface $framework): void
     {
@@ -247,7 +247,7 @@ class ServiceProjectType extends AbstractType
     /**
      * @param FormInterface<ServiceProjectModel> $form
      */
-    private function addWebServerField(FormInterface $form, ?WebServer $webserver): void
+    private function addWebServerField(FormInterface $form): void
     {
         // Par défaut, on propose seulement LOCAL
         // Le JavaScript se chargera de charger les webservers disponibles selon le projet

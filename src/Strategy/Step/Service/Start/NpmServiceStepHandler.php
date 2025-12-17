@@ -8,10 +8,9 @@ use App\Enum\ApplicationStep;
 use App\Enum\Log\TypeLog;
 use App\Model\Project;
 use App\Model\Service\AbstractContainer;
-use App\Strategy\Step\AbstractServiceStepHandler;
 use App\Strategy\Step\AbstractStartServiceStepHandler;
 
-final readonly class NpmServiceStepHandler extends AbstractStartServiceStepHandler
+final class NpmServiceStepHandler extends AbstractStartServiceStepHandler
 {
     public function __invoke(AbstractContainer $serviceContainer, Project $project): void
     {

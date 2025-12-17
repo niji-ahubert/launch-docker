@@ -14,18 +14,17 @@ use App\Services\FileSystemEnvironmentServices;
 use App\Services\Mercure\MercureService;
 use App\Services\ProcessRunnerService;
 use App\Strategy\Step\AbstractBuildServiceStepHandler;
-use App\Strategy\Step\AbstractServiceStepHandler;
 use App\Strategy\Webserver\abstractConfiguration;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-final readonly class WebserverConfigurationServiceStepHandler extends AbstractBuildServiceStepHandler
+final class WebserverConfigurationServiceStepHandler extends AbstractBuildServiceStepHandler
 {
     /**
      * @param iterable<abstractConfiguration> $webserverConfigurations
      */
     public function __construct(
         #[AutowireIterator(abstractConfiguration::APP_STEP_HANDLER)]
-        private iterable              $webserverConfigurations,
+        private readonly iterable              $webserverConfigurations,
         FileSystemEnvironmentServices $fileSystemEnvironmentServices,
         MercureService                $mercureService,
         ProcessRunnerService          $processRunner,

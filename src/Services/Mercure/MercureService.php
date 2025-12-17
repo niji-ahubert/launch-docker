@@ -15,8 +15,8 @@ final  class MercureService
 {
 
     private ?project $project = null;
-    public const MERCURE_TOPIC = 'chat';
-    public const TARGET_ID = 'messages';
+    public const string MERCURE_TOPIC = 'chat';
+    public const string TARGET_ID = 'messages';
     private ?LoggerChannel $loggerChannel = null;
 
     public function __construct(

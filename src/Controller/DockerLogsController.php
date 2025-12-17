@@ -51,9 +51,6 @@ class DockerLogsController extends AbstractController
 
         $this->buildImageProjectService->buildProject($project);
 
-        $this->startProjectService->startProject(project: $project, onlyProjectService: true);
-        $this->projectGenerationService->executeCreateApplicationService($project, DockerAction::START, onlyProjectService: true);
-        //  $this->stopProjectService->stopProject($project);
 
         return new Response('published!');
 
@@ -65,7 +62,7 @@ class DockerLogsController extends AbstractController
     #[Route('/docker-action/start', name: 'app_docker_logs_start', methods: ['GET'])]
     public function startProject(#[EnrichedProject] Project $project): Response
     {
-        $this->startProjectService->startProject($project);
+        $this->startProjectService->startProject(project: $project, onlyProjectService: false, detach: true);
         $this->projectGenerationService->executeCreateApplicationService($project, DockerAction::START);
 
 

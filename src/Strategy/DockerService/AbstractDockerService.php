@@ -54,7 +54,6 @@ abstract readonly class AbstractDockerService
     abstract public function support(AbstractContainer $service): bool;
 
     /**
-     * @param Project $project
      * @return array<string, array<int|string, string>|string>
      * @throws RuntimeCommandException
      *
@@ -64,7 +63,7 @@ abstract readonly class AbstractDockerService
     /**
      * @return string[]
      */
-    protected function getDefaultPorts(AbstractContainer $service): array
+    public function getDefaultPorts(AbstractContainer $service): array
     {
         return [];
     }

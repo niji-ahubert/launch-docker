@@ -38,7 +38,7 @@ final readonly class ProjectValueResolver implements ValueResolverInterface
         $project->setProject($projectName);
 
         $attributes = $argument->getAttributes(EnrichedProject::class);
-        if (!empty($attributes)) {
+        if ($attributes !== []) {
             $project = $this->environmentServices->loadEnvironments($project);
         }
 

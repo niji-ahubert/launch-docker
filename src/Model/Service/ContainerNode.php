@@ -7,7 +7,6 @@ namespace App\Model\Service;
 use App\Enum\ContainerType\ProjectContainer;
 
 use App\Enum\ServiceVersion\VersionNodeSupported;
-use App\Enum\ServiceVersion\VersionPgsqlSupported;
 use App\Enum\ServiceVersion\VersionServiceSupportedInterface;
 use App\Enum\WebServer;
 use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;

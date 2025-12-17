@@ -8,6 +8,7 @@ use App\Enum\DockerAction;
 use App\Enum\Log\LoggerChannel;
 use App\Enum\Log\TypeLog;
 use App\Model\Project;
+use App\Model\Service\AbstractContainer;
 use App\Services\DockerCompose\CreateDockerService;
 use App\Services\DockerCompose\DockerComposeFile;
 use App\Services\FileSystemEnvironmentServices;
@@ -49,12 +50,12 @@ final readonly class ProjectGenerationService
             $this->dockerComposeFileService->getDockerComposeFile($project);
             $this->mercureService->dispatch(message: '✅ Fichier docker-compose.yml généré avec succès');
 
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             $this->mercureService->dispatch(
                 message: '❌ Erreur lors de la génération du docker-compose.yml',
                 type: TypeLog::ERROR,
                 level: Level::Error,
-                error: $e->getMessage()
+                error: $exception->getMessage()
             );
             return;
         }
@@ -70,12 +71,12 @@ final readonly class ProjectGenerationService
                 message: '✅ Création dossier logs généré avec succès',
             );
 
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             $this->mercureService->dispatch(
                 message: '❌ Erreur lors de la création du dossier logs',
                 type: TypeLog::ERROR,
                 level: Level::Error,
-                error: $e->getMessage()
+                error: $exception->getMessage()
             );
         }
 
@@ -90,12 +91,12 @@ final readonly class ProjectGenerationService
                 message: '✅ Création du dossier docker généré avec succès',
             );
 
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             $this->mercureService->dispatch(
                 message: '❌ Erreur lors de la création du dossier docker',
                 type: TypeLog::ERROR,
                 level: Level::Error,
-                error: $e->getMessage()
+                error: $exception->getMessage()
             );
         }
 
@@ -115,7 +116,7 @@ final readonly class ProjectGenerationService
         
         foreach ($project->getServiceContainer() as $service) {
 
-            if ($onlyProjectService === true && $service->getServiceContainer() instanceof ServiceContainer) {
+            if ($onlyProjectService && $service->getServiceContainer() instanceof ServiceContainer) {
                 continue;
             }
 
@@ -175,12 +176,12 @@ final readonly class ProjectGenerationService
             if ($serviceName !== null) {
                 $this->publishContainerLogs($project, $serviceName);
             }
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             $this->mercureService->dispatch(
                 message: $errorMessage,
                 type: TypeLog::ERROR,
                 level: Level::Error,
-                error: $e->getMessage()
+                error: $exception->getMessage()
             );
         }
     }
@@ -202,7 +203,7 @@ final readonly class ProjectGenerationService
                 tail: 50
             );
             
-            if (!empty($logs)) {
+            if ($logs !== '' && $logs !== '0') {
                 $this->mercureService->dispatch(
                     message: \sprintf('📋 Logs du container %s:', $serviceName),
                     level: Level::Debug
@@ -211,7 +212,7 @@ final readonly class ProjectGenerationService
                 // Publier les logs ligne par ligne
                 $logLines = explode("\n", trim($logs));
                 foreach ($logLines as $logLine) {
-                    if (!empty(trim($logLine))) {
+                    if (!in_array(trim($logLine), ['', '0'], true)) {
                         $this->mercureService->dispatch(
                             message: $logLine,
                             level: Level::Debug
@@ -219,19 +220,19 @@ final readonly class ProjectGenerationService
                     }
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             // Ne pas bloquer le processus si la récupération des logs échoue
             $this->mercureService->dispatch(
-                message: \sprintf('⚠️ Impossible de récupérer les logs du container %s: %s', $serviceName, $e->getMessage()),
+                message: \sprintf('⚠️ Impossible de récupérer les logs du container %s: %s', $serviceName, $exception->getMessage()),
                 level: Level::Warning
             );
         }
     }
 
-    private function getServiceName($service): string
+    private function getServiceName(AbstractContainer $service): string
     {
         return $service->getServiceContainer() instanceof ServiceContainer
             ? $service->getServiceContainer()->value
-            : $service->getFolderName();
+            : (string) $service->getFolderName();
     }
 }

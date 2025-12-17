@@ -61,6 +61,8 @@ final readonly class AvailableServicesProvider
 
     /**
      * Formatte les enums en choix pour les formulaires
+     * @param array<\Symfony\Contracts\Translation\TranslatableInterface&\BackedEnum> $enums
+     * @return array<string, string|int>
      */
     public function formatAsChoices(array $enums): array
     {
@@ -73,6 +75,8 @@ final readonly class AvailableServicesProvider
 
     /**
      * Formatte les enums en JSON pour les API
+     * @param array<\Symfony\Contracts\Translation\TranslatableInterface&\BackedEnum> $enums
+     * @return array<int, array<string, string|int>>
      */
     public function formatAsJson(array $enums): array
     {

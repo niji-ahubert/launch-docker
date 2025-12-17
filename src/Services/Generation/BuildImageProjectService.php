@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Generation;
 
+use App\Model\DockerData;
 use App\Enum\ContainerType\ServiceContainer;
 use App\Enum\Log\LoggerChannel;
 use App\Enum\Log\TypeLog;
@@ -121,7 +122,7 @@ final readonly class BuildImageProjectService
 
         $objDocker = DockerUtility::getDockerfileVariable($service, $project);
 
-        if ($objDocker !== null) {
+        if ($objDocker instanceof DockerData && !DockerUtility::dockerImageExists($objDocker->getImageName())) {
             $command = ['docker', '--log-level=ERROR', 'compose', '-f', 'docker-compose.admin.yml', '--profile', 'builder', 'build'];
             $command[] = sprintf("build-php-%s", $project->getEnvironmentContainer()->value);
 

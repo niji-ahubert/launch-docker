@@ -17,7 +17,6 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Uid\Uuid;
-use Webmozart\Assert\Assert;
 
 #[AutoconfigureTag()]
 #[DiscriminatorMap(
@@ -30,9 +29,9 @@ use Webmozart\Assert\Assert;
 )]
 abstract class AbstractFramework
 {
-    private Uuid $id;
+    private readonly Uuid $id;
 
-    /** @var \App\Enum\Framework\FrameworkLanguageNode|\App\Enum\Framework\FrameworkLanguagePhp */
+    /** @var FrameworkLanguageNode|FrameworkLanguagePhp */
     protected FrameworkLanguageInterface $name;
 
     /** @var string[]|null */
@@ -59,13 +58,11 @@ abstract class AbstractFramework
     abstract public function support(string $frameworkChoose): bool;
 
     /**
-     * @return FrameworkLanguageInterface|null
      * @phpstan-return FrameworkLanguageInterface<FrameworkLanguagePhp|FrameworkLanguageNode>|null
      */
     abstract public function getFrameworkEnum(string $stringEnumValue): ?FrameworkLanguageInterface;
 
     /**
-     * @return VersionFrameworkSupportedInterface|null
      * @phpstan-return VersionFrameworkSupportedInterface<VersionSymfonySupported|VersionReactSupported|VersionLaravelSupported>|null
      */
     abstract public function getVersionFrameworkEnum(): ?VersionFrameworkSupportedInterface;
@@ -109,7 +106,7 @@ abstract class AbstractFramework
     }
 
     /**
-     * @return FrameworkLanguageNode|\App\Enum\Framework\FrameworkLanguagePhp
+     * @return FrameworkLanguageNode|FrameworkLanguagePhp
      */
     public function getName(): FrameworkLanguageInterface
     {
@@ -117,7 +114,7 @@ abstract class AbstractFramework
     }
 
     /**
-     * @param FrameworkLanguageNode|\App\Enum\Framework\FrameworkLanguagePhp $name
+     * @param FrameworkLanguageNode|FrameworkLanguagePhp $name
      */
     public function setName(FrameworkLanguageInterface $name): self
     {

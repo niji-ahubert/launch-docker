@@ -6,8 +6,6 @@ namespace App\Controller;
 
 use App\Attribute\EnrichedProject;
 use App\Enum\ContainerType\ProjectContainer;
-use App\Enum\ContainerType\ServiceContainer;
-use App\Enum\DataStorage;
 use App\Enum\Framework\FrameworkLanguageInterface;
 use App\Enum\PhpExtension;
 use App\Enum\ServiceVersion\VersionFrameworkSupportedInterface;
@@ -17,7 +15,6 @@ use App\Form\Service\AvailableServicesProvider;
 use App\Model\Project;
 use App\Model\Service\AbstractContainer;
 use App\Model\Service\AbstractFramework;
-use App\Services\FileSystemEnvironmentServices;
 use App\Services\Form\FrameworkServices;
 use App\Services\StrategyManager\ContainerServices;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -195,8 +192,8 @@ class ServiceProjectController extends AbstractController
 
             return new JsonResponse(['webservers' => $choices]);
 
-        } catch (\Exception $e) {
-            return new JsonResponse(['error' => 'Erreur lors du chargement du projet: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        } catch (\Exception $exception) {
+            return new JsonResponse(['error' => 'Erreur lors du chargement du projet: ' . $exception->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -211,9 +208,9 @@ class ServiceProjectController extends AbstractController
             $choices = $this->availableServicesProvider->formatAsJson($storages);
 
             return new JsonResponse(['storages' => $choices]);
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             return new JsonResponse(
-                ['error' => 'Erreur lors du chargement des storages: ' . $e->getMessage()],
+                ['error' => 'Erreur lors du chargement des storages: ' . $exception->getMessage()],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
