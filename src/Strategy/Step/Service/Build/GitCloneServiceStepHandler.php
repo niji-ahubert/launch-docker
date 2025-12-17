@@ -19,34 +19,26 @@ final class GitCloneServiceStepHandler extends AbstractBuildServiceStepHandler
     public const string MAIN_GIT_BRANCH = 'main';
 
     public function __construct(
-        private readonly Filesystem            $filesystem,
+        private readonly Filesystem $filesystem,
         FileSystemEnvironmentServices $fileSystemEnvironmentServices,
-        MercureService                $mercureService,
-        ProcessRunnerService          $processRunner,
-        private readonly string                $projectDir
-    )
-    {
+        MercureService $mercureService,
+        ProcessRunnerService $processRunner,
+        private readonly string $projectDir,
+    ) {
         parent::__construct($fileSystemEnvironmentServices, $mercureService, $processRunner);
-    }
-
-    public static function getPriority(): int
-    {
-        return 6;
     }
 
     public function __invoke(AbstractContainer $serviceContainer, Project $project): void
     {
-
         $applicationProjectPath = $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $serviceContainer);
 
-
         if (!$this->filesystem->exists($applicationProjectPath) && null !== $serviceContainer->getGithubRepository()) {
-
-            if ($this->fileSystemEnvironmentServices->isDirectoryEmpty($applicationProjectPath) === false) {
+            if (false === $this->fileSystemEnvironmentServices->isDirectoryEmpty($applicationProjectPath)) {
                 $this->mercureService->dispatch(
-                    message: sprintf('Le dossier %s n\'est pas vide, opération annulée', $applicationProjectPath),
-                    level: Level::Warning
+                    message: \sprintf('Le dossier %s n\'est pas vide, opération annulée', $applicationProjectPath),
+                    level: Level::Warning,
                 );
+
                 return;
             }
 
@@ -58,9 +50,12 @@ final class GitCloneServiceStepHandler extends AbstractBuildServiceStepHandler
             $cmd = ['git', 'clone', '--branch', $branch, $repository, $applicationProjectPath];
 
             $this->processRunner->run($cmd, $message, $this->projectDir);
-
-
         }
+    }
+
+    public static function getPriority(): int
+    {
+        return 6;
     }
 
     public function getStepName(): ApplicationStep

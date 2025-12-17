@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Enum;
 
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -12,7 +14,6 @@ enum DockerAction: string implements TranslatableInterface
     case STOP = 'stop';
     case DELETE = 'delete';
 
-
     public function trans(TranslatorInterface $translator, ?string $locale = null): string
     {
         return match ($this) {
@@ -23,4 +24,3 @@ enum DockerAction: string implements TranslatableInterface
         };
     }
 }
-

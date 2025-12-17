@@ -27,11 +27,10 @@ use Webmozart\Assert\Assert;
 class ServiceExternalController extends AbstractController
 {
     public function __construct(
-        private readonly FormServiceService       $formServiceService,
-        private readonly TranslatorInterface      $translator,
+        private readonly FormServiceService $formServiceService,
+        private readonly TranslatorInterface $translator,
         private readonly EventDispatcherInterface $eventDispatcher,
-    )
-    {
+    ) {
     }
 
     #[Route('/project/external-services/delete/{type}/{uuid}', name: 'app_project_external_services_action_remove', methods: ['POST'])]
@@ -49,19 +48,18 @@ class ServiceExternalController extends AbstractController
             throw new BadRequestHttpException('Parameter type only support TypeService Enum value');
         }
 
-
         try {
             $modelOption = $this->formServiceService->getModelOption($typeService, $project, $uuid);
             $this->formServiceService->removeService($typeService, $project, $modelOption->model);
 
             // Dispatcher l'événement de suppression pour les services externes
-            if ($typeService === TypeService::EXTERNAL && $modelOption->model instanceof ServiceExternalModel) {
+            if (TypeService::EXTERNAL === $typeService && $modelOption->model instanceof ServiceExternalModel) {
                 Assert::notNull($modelOption->model->getServiceName());
                 $event = new ServiceExternalRemoved(
                     $project,
                     $typeService,
                     $modelOption->model,
-                    $modelOption->model->getServiceName()
+                    $modelOption->model->getServiceName(),
                 );
                 $this->eventDispatcher->dispatch($event);
             }
@@ -101,7 +99,7 @@ class ServiceExternalController extends AbstractController
                 $messageKey = $isEdit ? 'service.success.updated' : 'service.success.created';
                 $this->addFlash('success', $this->translator->trans($messageKey));
             } catch (\Exception $e) {
-                $this->addFlash('error', 'Erreur lors de l\'ajout du service : ' . $e->getMessage());
+                $this->addFlash('error', 'Erreur lors de l\'ajout du service : '.$e->getMessage());
             }
         }
 
@@ -116,10 +114,9 @@ class ServiceExternalController extends AbstractController
 
     #[Route('/project/external-service/versions', name: 'app_service_versions')]
     public function getVersions(
-        Request           $request,
+        Request $request,
         ContainerServices $containerServices,
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $serviceName = $request->query->get('service');
 
         if (!$serviceName) {

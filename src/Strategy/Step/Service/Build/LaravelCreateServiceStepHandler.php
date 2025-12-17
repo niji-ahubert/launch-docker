@@ -13,7 +13,7 @@ use App\Services\ProcessRunnerService;
 use App\Strategy\Step\AbstractBuildServiceStepHandler;
 use Monolog\Level;
 
-final class LaravelCreateServiceStepHandler extends AbstractBuildServiceStepHandler 
+final class LaravelCreateServiceStepHandler extends AbstractBuildServiceStepHandler
 {
     public function __construct(
         FileSystemEnvironmentServices $fileSystemEnvironmentServices,
@@ -21,21 +21,21 @@ final class LaravelCreateServiceStepHandler extends AbstractBuildServiceStepHand
         ProcessRunnerService $processRunner,
         private readonly string $hostUid,
         private readonly string $hostGid,
-        private readonly string $projectRoot
+        private readonly string $projectRoot,
     ) {
         parent::__construct($fileSystemEnvironmentServices, $mercureService, $processRunner);
     }
 
     public function __invoke(AbstractContainer $serviceContainer, Project $project): void
     {
-
         $applicationProjectPath = $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $serviceContainer);
 
-        if ($this->fileSystemEnvironmentServices->isDirectoryEmpty($applicationProjectPath) === false) {
+        if (false === $this->fileSystemEnvironmentServices->isDirectoryEmpty($applicationProjectPath)) {
             $this->mercureService->dispatch(
-                message: sprintf('Le dossier %s n\'est pas vide, l\'opération Création du projet laravel est annulée', $applicationProjectPath),
-                level: Level::Warning
+                message: \sprintf('Le dossier %s n\'est pas vide, l\'opération Création du projet laravel est annulée', $applicationProjectPath),
+                level: Level::Warning,
             );
+
             return;
         }
 
@@ -43,24 +43,22 @@ final class LaravelCreateServiceStepHandler extends AbstractBuildServiceStepHand
             'docker',
             'run',
             '--rm',
-              '--user', sprintf('%s:%s', $this->hostUid, $this->hostGid),
-            '--volume', sprintf('%s:/app', str_replace('/var/www/html', $this->projectRoot, $applicationProjectPath)),
+            '--user', \sprintf('%s:%s', $this->hostUid, $this->hostGid),
+            '--volume', \sprintf('%s:/app', str_replace('/var/www/html', $this->projectRoot, $applicationProjectPath)),
             'composer',
             'create-project',
             'laravel/laravel',
             '.',
-            '--no-interaction'
+            '--no-interaction',
         ];
 
         $this->processRunner->run(
             $command,
             '⚙️ Création du projet Laravel',
-            $applicationProjectPath
+            $applicationProjectPath,
         );
 
         $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $serviceContainer);
-
-
     }
 
     public static function getPriority(): int

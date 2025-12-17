@@ -1,16 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Util;
 
-use App\Model\Service\AbstractFramework;
 use App\Enum\ContainerType\ProjectContainer;
 use App\Enum\Environment;
 use App\Enum\Framework\FrameworkLanguagePhp;
 use App\Model\Service\AbstractContainer;
+use App\Model\Service\AbstractFramework;
 
 final readonly class ServiceContainerUtility
 {
-
     public static function isSymfonyDevService(AbstractContainer $service, Environment $environment): bool
     {
         if (Environment::DEV !== $environment) {
@@ -32,7 +33,6 @@ final readonly class ServiceContainerUtility
 
         return FrameworkLanguagePhp::SYMFONY === $framework->getName();
     }
-
 
     public static function getSymfonyDebugMessage(): string
     {

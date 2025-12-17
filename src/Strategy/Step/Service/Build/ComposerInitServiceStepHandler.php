@@ -14,18 +14,18 @@ final class ComposerInitServiceStepHandler extends AbstractBuildServiceStepHandl
 {
     public function __invoke(AbstractContainer $serviceContainer, Project $project): void
     {
-        if ($this->fileSystemEnvironmentServices->composerAlreadyDefined($project, $serviceContainer) === false) {
+        if (false === $this->fileSystemEnvironmentServices->composerAlreadyDefined($project, $serviceContainer)) {
             $this->mercureService->dispatch(
                 message: 'Composer est déjà défini',
-                level: Level::Warning
+                level: Level::Warning,
             );
+
             return;
         }
 
         $applicationProjectPath = $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $serviceContainer);
         $projectName = strtolower(basename($applicationProjectPath));
         $containerType = $serviceContainer->getServiceContainer()->value;
-
 
         $cmd = [
             'composer',
@@ -37,7 +37,6 @@ final class ComposerInitServiceStepHandler extends AbstractBuildServiceStepHandl
         ];
 
         $this->processRunner->run($cmd, 'Initialisation de la cmd Composer init', $applicationProjectPath);
-
     }
 
     public static function getPriority(): int

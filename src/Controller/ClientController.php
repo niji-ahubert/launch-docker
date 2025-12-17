@@ -20,10 +20,9 @@ class ClientController extends AbstractController
 {
     public function __construct(
         private readonly FileSystemEnvironmentServices $fileSystemEnvironmentServices,
-        private readonly TranslatorInterface           $translator,
-        private readonly ClientNameNormalizer          $clientNameNormalizer,
-    )
-    {
+        private readonly TranslatorInterface $translator,
+        private readonly ClientNameNormalizer $clientNameNormalizer,
+    ) {
     }
 
     #[Route('/client/', name: 'app_client_list')]
@@ -111,7 +110,7 @@ class ClientController extends AbstractController
         // Vérifier le token CSRF
         $token = $request->request->get('_token');
         Assert::string($token);
-        if (!$this->isCsrfTokenValid('delete_client_' . $clientName, $token)) {
+        if (!$this->isCsrfTokenValid('delete_client_'.$clientName, $token)) {
             $this->addFlash('error', $this->translator->trans('security.csrf.invalid'));
 
             return $this->redirectToRoute('app_client_list');

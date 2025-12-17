@@ -8,9 +8,9 @@ use App\Enum\ContainerType\ProjectContainer;
 use App\Enum\ContainerType\ServiceContainer;
 use App\Enum\PhpExtension;
 use App\Enum\ServiceVersion\VersionRedisSupported;
+use App\Enum\ServiceVersion\VersionServiceSupportedInterface;
 use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Webmozart\Assert\Assert;
-use \App\Enum\ServiceVersion\VersionServiceSupportedInterface;
 
 #[AsTaggedItem(priority: 10)]
 final class ContainerRedis extends AbstractContainer implements ServiceContainerInterface

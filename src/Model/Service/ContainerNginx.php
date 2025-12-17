@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Model\Service;
 
 use App\Enum\ContainerType\ServiceContainer;
-
 use App\Enum\ServiceVersion\VersionNginxSupported;
 use App\Enum\ServiceVersion\VersionServiceSupportedInterface;
 use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;

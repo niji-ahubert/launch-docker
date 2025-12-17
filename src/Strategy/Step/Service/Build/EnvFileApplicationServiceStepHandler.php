@@ -22,31 +22,29 @@ final class EnvFileApplicationServiceStepHandler extends AbstractBuildServiceSte
      * @param iterable<EnvModifierInterface> $envModifiers
      */
     public function __construct(
-        FileSystemEnvironmentServices   $fileSystemEnvironmentServices,
-        MercureService                  $mercureService,
-        ProcessRunnerService            $processRunner,
-        private readonly Filesystem              $filesystem,
+        FileSystemEnvironmentServices $fileSystemEnvironmentServices,
+        MercureService $mercureService,
+        ProcessRunnerService $processRunner,
+        private readonly Filesystem $filesystem,
         #[AutowireIterator('app.env_modifier')]
-        private readonly iterable                $envModifiers,
-    )
-    {
+        private readonly iterable $envModifiers,
+    ) {
         parent::__construct($fileSystemEnvironmentServices, $mercureService, $processRunner);
     }
 
     public function __invoke(AbstractContainer $serviceContainer, Project $project): void
     {
-
         $this->mercureService->dispatch(
             message: '📦 Création mise à jour des variables environements applicative',
-            type: TypeLog::START
+            type: TypeLog::START,
         );
 
-        if ($this->filesystem->exists(sprintf('%s/.env', $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $serviceContainer)))) {
-            $targetEnv = sprintf('%s/.env.niji-launcher',$this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $serviceContainer));
-            $this->filesystem->copy(sprintf('%s/.env', $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $serviceContainer)), $targetEnv);
+        if ($this->filesystem->exists(\sprintf('%s/.env', $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $serviceContainer)))) {
+            $targetEnv = \sprintf('%s/.env.niji-launcher', $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $serviceContainer));
+            $this->filesystem->copy(\sprintf('%s/.env', $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $serviceContainer)), $targetEnv);
 
             $content = file_get_contents($targetEnv);
-            if ($content === false) {
+            if (false === $content) {
                 return;
             }
             /** @var EnvModifierInterface $modifier */
@@ -59,7 +57,7 @@ final class EnvFileApplicationServiceStepHandler extends AbstractBuildServiceSte
         $this->mercureService->dispatch(
             message: '✅ Création mise à jour des variables environements applicative success',
             type: TypeLog::COMPLETE,
-            exitCode: 0
+            exitCode: 0,
         );
     }
 

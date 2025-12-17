@@ -24,11 +24,9 @@ use Symfony\Component\Mercure\Update;
 final readonly class MercurePublisherSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private HubInterface         $hub,
-        private ProjectLoggerService $projectLoggerService
-    )
-    {
-
+        private HubInterface $hub,
+        private ProjectLoggerService $projectLoggerService,
+    ) {
     }
 
     /**
@@ -43,14 +41,13 @@ final readonly class MercurePublisherSubscriber implements EventSubscriberInterf
         ];
     }
 
-
     public function onServerEventDispatched(ServerEventDispatched $event): void
     {
         $logger = $this->projectLoggerService->getLogger($event->getProject(), $event->getLoggerChannel());
         $this->logs($event->getServerEvent(), $logger);
         $this->publishToMercure(
             $event->getServerEvent(),
-            $logger
+            $logger,
         );
     }
 
@@ -66,7 +63,6 @@ final readonly class MercurePublisherSubscriber implements EventSubscriberInterf
             'error' => $message->getError(),
         ];
 
-
         match ($level) {
             Level::Debug => $logger->debug($logMessage, $context),
             Level::Notice => $logger->notice($logMessage, $context),
@@ -75,27 +71,24 @@ final readonly class MercurePublisherSubscriber implements EventSubscriberInterf
             Level::Critical => $logger->critical($logMessage, $context),
             Level::Alert => $logger->alert($logMessage, $context),
             Level::Emergency => $logger->emergency($logMessage, $context),
-            default => $logger->info($logMessage, $context)
+            default => $logger->info($logMessage, $context),
         };
     }
 
     private function publishToMercure(
         ServerEventModel $message,
-        LoggerInterface  $logger,
-    ): void
-    {
-
-
+        LoggerInterface $logger,
+    ): void {
         // Création du contenu Turbo Stream
-        $turboStreamContent = sprintf(
+        $turboStreamContent = \sprintf(
             '<turbo-stream action="append" targets="#%s">
                 <template>
                     <div class="%s text-xs ">%s</div>
                 </template>
             </turbo-stream>',
-            htmlspecialchars(MercureService::TARGET_ID, ENT_QUOTES, 'UTF-8'),
-            htmlspecialchars($this->getCssClassForLine($message), ENT_QUOTES, 'UTF-8'),
-            htmlspecialchars((string) preg_replace('/\e\[[0-9;]*m/', '', $message->getMessage()), ENT_QUOTES, 'UTF-8')
+            htmlspecialchars(MercureService::TARGET_ID, \ENT_QUOTES, 'UTF-8'),
+            htmlspecialchars($this->getCssClassForLine($message), \ENT_QUOTES, 'UTF-8'),
+            htmlspecialchars((string) preg_replace('/\e\[[0-9;]*m/', '', $message->getMessage()), \ENT_QUOTES, 'UTF-8'),
         );
 
         $update = new Update(MercureService::MERCURE_TOPIC, $turboStreamContent);
@@ -114,6 +107,7 @@ final readonly class MercurePublisherSubscriber implements EventSubscriberInterf
      * Détermine une classe CSS Tailwind selon le niveau du message.
      *
      * @param ServerEventModel $message Message à analyser
+     *
      * @return string Classe CSS Tailwind
      */
     private function getCssClassForLine(ServerEventModel $message): string
@@ -127,5 +121,4 @@ final readonly class MercurePublisherSubscriber implements EventSubscriberInterf
             default => 'text-gray-300',
         };
     }
-
 }

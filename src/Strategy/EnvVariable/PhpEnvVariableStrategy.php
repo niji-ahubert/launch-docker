@@ -13,20 +13,18 @@ use App\Model\Service\AbstractContainer;
  */
 class PhpEnvVariableStrategy extends AbstractEnvVariableStrategy
 {
-
     public function generateSocleEnvVariables(AbstractContainer $serviceContainer, Project $project): array
     {
         return [
             'PHP_VERSION' => $serviceContainer->getDockerVersionService() ?? throw new \Exception('Version de Docker non définie'),
             'DOCKER_ENV' => $project->getEnvironmentContainer()->value,
         ];
-
     }
 
     /**
-     * @return array<string, int|string>
      * @throws \Exception
      *
+     * @return array<string, int|string>
      */
     public function generateVariables(AbstractContainer $serviceContainer, Project $project): array
     {

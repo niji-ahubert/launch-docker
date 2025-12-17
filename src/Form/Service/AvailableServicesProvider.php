@@ -1,20 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Form\Service;
 
-
+use App\Enum\ContainerType\ProjectContainer;
 use App\Enum\DataStorage;
 use App\Enum\WebServer;
-use App\Enum\ContainerType\ProjectContainer;
 use App\Model\Project;
+use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class AvailableServicesProvider
 {
     public function __construct(
-        private TranslatorInterface $translator
-    )
-    {
+        private TranslatorInterface $translator,
+    ) {
     }
 
     /**
@@ -32,7 +33,7 @@ final readonly class AvailableServicesProvider
             $serviceName = strtolower($container->getName());
             $storageEnum = DataStorage::tryFrom($serviceName);
 
-            if ($storageEnum && !in_array($storageEnum, $availableStorages, true)) {
+            if ($storageEnum && !\in_array($storageEnum, $availableStorages, true)) {
                 $availableStorages[] = $storageEnum;
             }
         }
@@ -51,7 +52,7 @@ final readonly class AvailableServicesProvider
             $serviceName = strtolower($container->getName());
             $webServerEnum = WebServer::tryFrom($serviceName);
 
-            if ($webServerEnum && !in_array($webServerEnum, $availableWebServers, true)) {
+            if ($webServerEnum && !\in_array($webServerEnum, $availableWebServers, true)) {
                 $availableWebServers[] = $webServerEnum;
             }
         }
@@ -60,9 +61,11 @@ final readonly class AvailableServicesProvider
     }
 
     /**
-     * Formatte les enums en choix pour les formulaires
-     * @param array<\Symfony\Contracts\Translation\TranslatableInterface&\BackedEnum> $enums
-     * @return array<string, string|int>
+     * Formatte les enums en choix pour les formulaires.
+     *
+     * @param array<\BackedEnum&TranslatableInterface> $enums
+     *
+     * @return array<string, int|string>
      */
     public function formatAsChoices(array $enums): array
     {
@@ -70,13 +73,16 @@ final readonly class AvailableServicesProvider
         foreach ($enums as $enum) {
             $choices[$enum->trans($this->translator)] = $enum->value;
         }
+
         return $choices;
     }
 
     /**
-     * Formatte les enums en JSON pour les API
-     * @param array<\Symfony\Contracts\Translation\TranslatableInterface&\BackedEnum> $enums
-     * @return array<int, array<string, string|int>>
+     * Formatte les enums en JSON pour les API.
+     *
+     * @param array<\BackedEnum&TranslatableInterface> $enums
+     *
+     * @return array<int, array<string, int|string>>
      */
     public function formatAsJson(array $enums): array
     {
@@ -88,6 +94,7 @@ final readonly class AvailableServicesProvider
                 'enum_class' => $enum::class,
             ];
         }
+
         return $choices;
     }
 }

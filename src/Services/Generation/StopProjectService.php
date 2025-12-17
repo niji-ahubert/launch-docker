@@ -24,12 +24,11 @@ final readonly class StopProjectService
 {
     public function __construct(
         private FileSystemEnvironmentServices $fileSystemEnvironmentServices,
-        private MercureService                $mercureService,
-        private string                        $projectDir, private ProcessRunnerService $processRunnerService
-    )
-    {
+        private MercureService $mercureService,
+        private string $projectDir,
+        private ProcessRunnerService $processRunnerService,
+    ) {
     }
-
 
     public function stopProject(Project $project): void
     {
@@ -46,7 +45,7 @@ final readonly class StopProjectService
             '-f',
             $this->fileSystemEnvironmentServices->getDockerComposeFilePath($project),
             'down',
-            '--remove-orphans'
+            '--remove-orphans',
         ];
 
         $this->processRunnerService->run($command, '📦 Arrêt des services externes', $this->projectDir);
@@ -56,8 +55,5 @@ final readonly class StopProjectService
             message: $completeMessage,
             type: TypeLog::COMPLETE,
         );
-
     }
-
-
 }

@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace App\Strategy\DockerService;
 
 use App\Enum\ContainerType\ProjectContainer;
-use App\Enum\DataStorage;
 use App\Enum\WebServer;
 use App\Model\Project;
 use App\Model\Service\AbstractContainer;
 use App\Services\DockerCompose\DockerComposeFile;
 use App\Services\FileSystemEnvironmentServices;
-use App\Strategy\DockerService\DatabaseDockerServiceInterface;
 use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
@@ -44,27 +42,27 @@ final readonly class PhpDockerService extends AbstractDockerService
             ],
         ];
 
-        if ($service->getWebServer() instanceof \App\Model\Service\WebServer && $service->getWebServer()->getWebServer() !== WebServer::LOCAL) {
-            $configPhp['labels'] = ['traefik.enable=false']; //si le webserver est ds un autre container on desactive treafik
+        if ($service->getWebServer() instanceof \App\Model\Service\WebServer && WebServer::LOCAL !== $service->getWebServer()->getWebServer()) {
+            $configPhp['labels'] = ['traefik.enable=false']; // si le webserver est ds un autre container on desactive treafik
         }
 
         $dependsOn = [];
-        if (!in_array($service->getDataStorages(), [null, []], true)) {
+        if (!\in_array($service->getDataStorages(), [null, []], true)) {
             $dataStorageValues = array_map(
-                fn($ds) => $ds->value,
-                $service->getDataStorages()
+                fn ($ds) => $ds->value,
+                $service->getDataStorages(),
             );
 
             foreach ($project->getServiceContainer() as $container) {
                 foreach ($this->dockerServices as $dockerService) {
                     /** @var AbstractDockerService $dockerService */
                     if (
-                        $dockerService instanceof DatabaseDockerServiceInterface &&
-                        $dockerService->support($container) &&
-                        \in_array($container->getServiceContainer()->value, $dataStorageValues, true)
+                        $dockerService instanceof DatabaseDockerServiceInterface
+                        && $dockerService->support($container)
+                        && \in_array($container->getServiceContainer()->value, $dataStorageValues, true)
                     ) {
                         $serviceName = $container->getDockerServiceName();
-                        if ($serviceName !== null) {
+                        if (null !== $serviceName) {
                             $dependsOn[] = $serviceName;
                         }
                         break;
@@ -73,7 +71,7 @@ final readonly class PhpDockerService extends AbstractDockerService
             }
         }
 
-        if ($dependsOn !== []) {
+        if ([] !== $dependsOn) {
             $configPhp['depends_on'] = $dependsOn;
         }
 

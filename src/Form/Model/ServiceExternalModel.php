@@ -30,18 +30,17 @@ class ServiceExternalModel
         $this->id = Uuid::v7();
     }
 
-    
     public function getId(): Uuid
     {
         return $this->id;
     }
 
-    public function setId(Uuid $id): ServiceExternalModel
+    public function setId(Uuid $id): self
     {
         $this->id = $id;
+
         return $this;
     }
-
 
     /** @return AbstractContainer[]|null */
     public function getAllServices(): ?array

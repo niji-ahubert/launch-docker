@@ -21,14 +21,12 @@ use Webmozart\Assert\Assert;
  */
 class ProjectLoggerService
 {
-
     /** @var array<string, LoggerInterface> */
     private array $loggers = [];
 
     public function __construct(
         private readonly FileSystemEnvironmentServices $fileSystemEnvironmentServices,
-    )
-    {
+    ) {
     }
 
     public function getLogger(Project $project, LoggerChannel $channel): LoggerInterface
@@ -40,10 +38,10 @@ class ProjectLoggerService
         }
 
         $logPath = $this->fileSystemEnvironmentServices->getLogFilePath($project, $channel);
-        $logDir = dirname($logPath);
+        $logDir = \dirname($logPath);
 
         if (!is_dir($logDir) && !mkdir($logDir, 0755, true) && !is_dir($logDir)) {
-            throw new \RuntimeException(sprintf('Le répertoire "%s" n\'a pas pu être créé', $logDir));
+            throw new \RuntimeException(\sprintf('Le répertoire "%s" n\'a pas pu être créé', $logDir));
         }
 
         $logger = new Logger($channel->value);
@@ -56,6 +54,7 @@ class ProjectLoggerService
 
     /**
      * Récupère le contenu des logs d'un projet.
+     *
      * @return array<int, string> Les lignes de logs
      */
     public function getLogContent(Project $project, LoggerChannel $channel, int $maxLines = 0): array
@@ -67,14 +66,14 @@ class ProjectLoggerService
         }
 
         $content = file_get_contents($logPath);
-        if ($content === false) {
+        if (false === $content) {
             return [];
         }
 
         $lines = explode("\n", trim($content));
 
-        if ($maxLines > 0 && count($lines) > $maxLines) {
-            return array_slice($lines, -$maxLines);
+        if ($maxLines > 0 && \count($lines) > $maxLines) {
+            return \array_slice($lines, -$maxLines);
         }
 
         return $lines;
@@ -84,6 +83,7 @@ class ProjectLoggerService
      * Liste tous les canaux de logs disponibles pour un projet.
      *
      * @param Project $project Le projet
+     *
      * @return array<LoggerChannel>
      */
     public function getAvailableChannels(Project $project): array
@@ -97,7 +97,7 @@ class ProjectLoggerService
         $channels = [];
         $files = scandir($logDir);
 
-        if ($files === false) {
+        if (false === $files) {
             return [];
         }
 
@@ -114,6 +114,7 @@ class ProjectLoggerService
 
     /**
      * Efface les logs d'un projet pour un canal spécifique.
+     *
      * @return int Le nombre de fichiers supprimés
      */
     public function clearLogs(Project $project, ?LoggerChannel $channel = null): int
@@ -140,9 +141,8 @@ class ProjectLoggerService
 
     private function getLoggerKey(Project $project, LoggerChannel $channel): string
     {
-        return sprintf('%s_%s_%s', $project->getClient(), $project->getProject(), $channel->value);
+        return \sprintf('%s_%s_%s', $project->getClient(), $project->getProject(), $channel->value);
     }
-
 
     private function deleteLogFile(Project $project, LoggerChannel $channel): bool
     {

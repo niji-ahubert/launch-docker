@@ -30,14 +30,12 @@ final readonly class DeleteProjectService
 {
     public function __construct(
         private FileSystemEnvironmentServices $fileSystemEnvironmentServices,
-        private MercureService                $mercureService,
-        private string                        $projectDir,
-        private ProcessRunnerService          $processRunnerService,
-        private StopProjectService            $stopProjectService
-    )
-    {
+        private MercureService $mercureService,
+        private string $projectDir,
+        private ProcessRunnerService $processRunnerService,
+        private StopProjectService $stopProjectService,
+    ) {
     }
-
 
     public function deleteProject(Project $project): void
     {
@@ -46,26 +44,22 @@ final readonly class DeleteProjectService
         $this->mercureService->initialize($project, LoggerChannel::DELETE);
 
         $this->mercureService->dispatch(
-            message: sprintf('📦 Suppression du projet %s %s', $project->getClient(), $project->getProject()),
+            message: \sprintf('📦 Suppression du projet %s %s', $project->getClient(), $project->getProject()),
             type: TypeLog::START,
         );
 
-
         foreach ($project->getServiceContainer() as $service) {
             try {
-
                 match (true) {
                     $service->getServiceContainer() instanceof ProjectContainer => $this->deleteService($project, $service),
                     default => null,
                 };
-
             } catch (ProcessFailedException $e) {
-
                 $this->mercureService->dispatch(
-                    message: sprintf('❌ Échec du démarrage pour le service: %s', $service->getFolderName()),
+                    message: \sprintf('❌ Échec du démarrage pour le service: %s', $service->getFolderName()),
                     type: TypeLog::ERROR,
                     level: Level::Error,
-                    error: $e->getMessage()
+                    error: $e->getMessage(),
                 );
             }
         }
@@ -74,19 +68,15 @@ final readonly class DeleteProjectService
         $command = [
             'rm',
             '-R',
-            $pathProject
+            $pathProject,
         ];
-
 
         $this->processRunnerService->run(
             $command,
-            sprintf('Suppression repertoire %s', $pathProject),
-            $this->projectDir
+            \sprintf('Suppression repertoire %s', $pathProject),
+            $this->projectDir,
         );
-
-
     }
-
 
     private function deleteService(Project $project, AbstractContainer $service): void
     {
@@ -95,8 +85,9 @@ final readonly class DeleteProjectService
             $this->mercureService->dispatch(
                 message: $warningMessage,
                 type: TypeLog::ERROR,
-                level: Level::Error
+                level: Level::Error,
             );
+
             return;
         }
 
@@ -106,7 +97,7 @@ final readonly class DeleteProjectService
             $this->mercureService->dispatch(
                 message: $errorMessage,
                 type: TypeLog::ERROR,
-                level: Level::Error
+                level: Level::Error,
             );
 
             return;
@@ -116,19 +107,14 @@ final readonly class DeleteProjectService
             'docker',
             'image',
             'rm',
-            $imageName
+            $imageName,
         ];
-
 
         $this->processRunnerService->run(
             $command,
-            sprintf('Delete docker Image %s', $service->getFolderName()),
+            \sprintf('Delete docker Image %s', $service->getFolderName()),
             $this->projectDir,
-            env: EnvVarUtility::loadEnvironmentVariables($this->fileSystemEnvironmentServices->getComponentEnvFile($project, $service))
+            env: EnvVarUtility::loadEnvironmentVariables($this->fileSystemEnvironmentServices->getComponentEnvFile($project, $service)),
         );
-
-
     }
-
-
 }

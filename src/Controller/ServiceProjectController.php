@@ -26,12 +26,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ServiceProjectController extends AbstractController
 {
     public function __construct(
-        private readonly ContainerServices         $containerServices,
-        private readonly FrameworkServices         $frameworkServices,
-        private readonly TranslatorInterface       $translator,
-        private readonly AvailableServicesProvider $availableServicesProvider
-    )
-    {
+        private readonly ContainerServices $containerServices,
+        private readonly FrameworkServices $frameworkServices,
+        private readonly TranslatorInterface $translator,
+        private readonly AvailableServicesProvider $availableServicesProvider,
+    ) {
     }
 
     #[Route('/api/frameworks/{language}', name: 'app_api_frameworks', methods: ['GET'])]
@@ -79,7 +78,7 @@ class ServiceProjectController extends AbstractController
         }
 
         $extensions = match ($language) {
-            ProjectContainer::PHP->value => array_map(static fn($case): PhpExtension => $case, PhpExtension::cases()),
+            ProjectContainer::PHP->value => array_map(static fn ($case): PhpExtension => $case, PhpExtension::cases()),
             default => [],
         };
 
@@ -148,8 +147,6 @@ class ServiceProjectController extends AbstractController
         $choices = [];
 
         foreach ($versions as $version) {
-
-
             // Récupérer l'enum du framework depuis la valeur string
             $frameworkEnum = $container->getFrameworkEnum($framework);
             $enumValue = $frameworkEnum?->getFrameworkVersionEnum($version);
@@ -170,13 +167,12 @@ class ServiceProjectController extends AbstractController
     public function getWebServers(#[EnrichedProject] Project $project): JsonResponse
     {
         try {
-
             $availableWebServers = [WebServer::LOCAL];
             foreach ($project->getServiceContainer() as $container) {
                 $serviceName = strtolower($container->getName());
                 $webServerEnum = WebServer::tryFrom($serviceName);
 
-                if ($webServerEnum && !in_array($webServerEnum, $availableWebServers, true)) {
+                if ($webServerEnum && !\in_array($webServerEnum, $availableWebServers, true)) {
                     $availableWebServers[] = $webServerEnum;
                 }
             }
@@ -191,18 +187,17 @@ class ServiceProjectController extends AbstractController
             }
 
             return new JsonResponse(['webservers' => $choices]);
-
         } catch (\Exception $exception) {
-            return new JsonResponse(['error' => 'Erreur lors du chargement du projet: ' . $exception->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return new JsonResponse(['error' => 'Erreur lors du chargement du projet: '.$exception->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
     // src/Controller/ServiceProjectController.php
     #[Route('/api/data-storages', name: 'app_api_data_storages', methods: ['GET'])]
     public function getDataStorages(
-        #[EnrichedProject] Project $project
-    ): JsonResponse
-    {
+        #[EnrichedProject]
+        Project $project,
+    ): JsonResponse {
         try {
             $storages = $this->availableServicesProvider->getAvailableDataStorages($project);
             $choices = $this->availableServicesProvider->formatAsJson($storages);
@@ -210,8 +205,8 @@ class ServiceProjectController extends AbstractController
             return new JsonResponse(['storages' => $choices]);
         } catch (\Exception $exception) {
             return new JsonResponse(
-                ['error' => 'Erreur lors du chargement des storages: ' . $exception->getMessage()],
-                Response::HTTP_INTERNAL_SERVER_ERROR
+                ['error' => 'Erreur lors du chargement des storages: '.$exception->getMessage()],
+                Response::HTTP_INTERNAL_SERVER_ERROR,
             );
         }
     }

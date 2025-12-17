@@ -21,10 +21,9 @@ use Webmozart\Assert\Assert;
 class UniqueClientNameValidator extends ConstraintValidator
 {
     public function __construct(
-        private readonly ClientNameNormalizer          $clientNameNormalizer,
+        private readonly ClientNameNormalizer $clientNameNormalizer,
         private readonly FileSystemEnvironmentServices $environmentServices,
-    )
-    {
+    ) {
     }
 
     /**

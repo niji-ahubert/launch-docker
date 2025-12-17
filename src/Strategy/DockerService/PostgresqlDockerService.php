@@ -16,19 +16,17 @@ final readonly class PostgresqlDockerService extends AbstractDatabaseDockerServi
 {
     public function __construct(
         #[Autowire(param: 'bdd.root_password')]
-        string                        $rootPassword,
+        string $rootPassword,
         #[Autowire(param: 'bdd.database')]
-        string                        $database,
+        string $database,
         #[Autowire(param: 'bdd.user')]
-        string                        $dbUser,
-        DockerComposeFile             $dockerComposeFile,
-        Generator                     $makerGenerator,
+        string $dbUser,
+        DockerComposeFile $dockerComposeFile,
+        Generator $makerGenerator,
         FileSystemEnvironmentServices $fileSystemEnvironmentServices,
-    )
-    {
+    ) {
         parent::__construct($rootPassword, $database, $dbUser, $rootPassword, $dockerComposeFile, $makerGenerator, $fileSystemEnvironmentServices);
     }
-
 
     public function support(AbstractContainer $service): bool
     {
@@ -41,23 +39,6 @@ final readonly class PostgresqlDockerService extends AbstractDatabaseDockerServi
         return ['5432'];
     }
 
-    protected function getServiceSkeleton(string $volumeName, AbstractContainer $service, Project $project): array
-    {
-
-        return [
-            'image' => \sprintf('%s:%s', ServiceContainer::PGSQL->getValue(), $service->getDockerVersionService()),
-            'container_name' => sprintf('%s_service_database', ServiceContainer::PGSQL->getValue()),
-            'profiles' => ['runner-dev'],
-            'networks' => ['traefik'],
-            'volumes' => [sprintf('%s:/var/lib/postgresql/data', $volumeName)],
-            'environment' => [
-                'POSTGRES_PASSWORD' => $this->rootPassword,
-                'POSTGRES_USER' => $this->dbUser,
-                'POSTGRES_DB' => $this->database,
-            ],
-        ];
-    }
-
     public function getDsnProtocol(): string
     {
         return ServiceContainer::PGSQL->value;
@@ -68,5 +49,20 @@ final readonly class PostgresqlDockerService extends AbstractDatabaseDockerServi
     {
         return $this->rootPassword;
     }
-    
+
+    protected function getServiceSkeleton(string $volumeName, AbstractContainer $service, Project $project): array
+    {
+        return [
+            'image' => \sprintf('%s:%s', ServiceContainer::PGSQL->getValue(), $service->getDockerVersionService()),
+            'container_name' => \sprintf('%s_service_database', ServiceContainer::PGSQL->getValue()),
+            'profiles' => ['runner-dev'],
+            'networks' => ['traefik'],
+            'volumes' => [\sprintf('%s:/var/lib/postgresql/data', $volumeName)],
+            'environment' => [
+                'POSTGRES_PASSWORD' => $this->rootPassword,
+                'POSTGRES_USER' => $this->dbUser,
+                'POSTGRES_DB' => $this->database,
+            ],
+        ];
+    }
 }

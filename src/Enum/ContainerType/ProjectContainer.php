@@ -12,7 +12,6 @@ use App\Enum\ServiceVersion\VersionPhpSupported;
 use App\Enum\ServiceVersion\VersionServiceSupportedInterface;
 use App\Enum\UtilityTrait;
 
-
 /**
  * @implements TypeContainerInterface<self>
  */
@@ -22,7 +21,6 @@ enum ProjectContainer: string implements TypeContainerInterface
 
     case PHP = 'php';
     case NODE = 'node';
-
 
     /**
      * @phpstan-return FrameworkLanguagePhp|FrameworkLanguageNode

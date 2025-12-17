@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services\Generation;
 
-use App\Model\DockerData;
 use App\Enum\ContainerType\ServiceContainer;
 use App\Enum\Log\LoggerChannel;
 use App\Enum\Log\TypeLog;
+use App\Model\DockerData;
 use App\Model\Project;
 use App\Model\Service\AbstractContainer;
 use App\Services\FileSystemEnvironmentServices;
@@ -23,13 +23,12 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 final readonly class BuildImageProjectService
 {
     public function __construct(
-        private MercureService                $mercureService,
-        private ProcessRunnerService          $processRunnerService,
+        private MercureService $mercureService,
+        private ProcessRunnerService $processRunnerService,
         private FileSystemEnvironmentServices $fileSystemEnvironmentServices,
-        private EnvFileGeneratorService       $envFileGeneratorService,
-        private string                        $projectDir
-    )
-    {
+        private EnvFileGeneratorService $envFileGeneratorService,
+        private string $projectDir,
+    ) {
     }
 
     /**
@@ -37,24 +36,20 @@ final readonly class BuildImageProjectService
      */
     public function buildProject(Project $project, ?array $selectedServices = null): void
     {
-
         $this->mercureService->initialize($project, LoggerChannel::BUILD);
 
         $this->mercureService->dispatch(
             message: '📦 Démarrage de la construction des images Docker',
             type: TypeLog::START,
-
         );
-
 
         $servicesToBuild = $this->getServicesToBuild($project, $selectedServices);
 
         if ([] === $servicesToBuild) {
-
             $this->mercureService->dispatch(
                 message: '❌ Aucun service à construire trouvé dans le projet',
                 type: TypeLog::ERROR,
-                level: Level::Error
+                level: Level::Error,
             );
 
             return;
@@ -68,14 +63,12 @@ final readonly class BuildImageProjectService
                 $this->buildServiceImage($project, $service);
                 $builtServices++;
             } catch (ProcessFailedException $e) {
-
                 $this->mercureService->dispatch(
                     message: \sprintf('Échec de la construction pour le service: %s', $service->getFolderName()),
                     type: TypeLog::ERROR,
                     level: Level::Error,
-                    error: $e->getMessage()
+                    error: $e->getMessage(),
                 );
-
             }
         }
 
@@ -85,11 +78,11 @@ final readonly class BuildImageProjectService
             message: $completeMessage,
             type: TypeLog::COMPLETE,
         );
-
     }
 
     /**
      * Construit l'image Docker pour un service spécifique.
+     *
      * @throws ProcessFailedException Si la commande de build échoue
      */
     private function buildServiceImage(Project $project, AbstractContainer $service): void
@@ -101,10 +94,9 @@ final readonly class BuildImageProjectService
         $this->mercureService->dispatch(message: $serviceStartMessage);
 
         if ($service->getServiceContainer() instanceof ServiceContainer) {
-
             $this->mercureService->dispatch(
-                message: sprintf('✅ Sercice %s build avec succès', $service->getServiceContainer()->value),
-                type: TypeLog::COMPLETE
+                message: \sprintf('✅ Sercice %s build avec succès', $service->getServiceContainer()->value),
+                type: TypeLog::COMPLETE,
             );
 
             return;
@@ -115,8 +107,9 @@ final readonly class BuildImageProjectService
             $this->mercureService->dispatch(
                 message: $warningMessage,
                 type: TypeLog::ERROR,
-                level: Level::Error
+                level: Level::Error,
             );
+
             return;
         }
 
@@ -124,15 +117,15 @@ final readonly class BuildImageProjectService
 
         if ($objDocker instanceof DockerData && !DockerUtility::dockerImageExists($objDocker->getImageName())) {
             $command = ['docker', '--log-level=ERROR', 'compose', '-f', 'docker-compose.admin.yml', '--profile', 'builder', 'build'];
-            $command[] = sprintf("build-php-%s", $project->getEnvironmentContainer()->value);
+            $command[] = \sprintf('build-php-%s', $project->getEnvironmentContainer()->value);
 
             $this->processRunnerService->run(
                 $command,
                 'Build common image',
-                $this->projectDir, env: $this->envFileGeneratorService->generateSocleEnv($service, $project)
+                $this->projectDir,
+                env: $this->envFileGeneratorService->generateSocleEnv($service, $project),
             );
         }
-
 
         // Construction du nom du service
         $serviceName = DockerComposeUtility::getProjectServiceName($project, $service);
@@ -144,22 +137,21 @@ final readonly class BuildImageProjectService
             '--project-name', DockerUtility::getProjectName($project),
             '-f', $this->fileSystemEnvironmentServices->getDockerComposeFilePath($project),
             'build',
-            $serviceName
+            $serviceName,
         ];
-
 
         $this->processRunnerService->run(
             $command,
-            sprintf('Build image %s', $serviceName),
-            $this->projectDir, env: EnvVarUtility::loadEnvironmentVariables($this->fileSystemEnvironmentServices->getComponentEnvFile($project, $service))
+            \sprintf('Build image %s', $serviceName),
+            $this->projectDir,
+            env: EnvVarUtility::loadEnvironmentVariables($this->fileSystemEnvironmentServices->getComponentEnvFile($project, $service)),
         );
-
     }
 
     /**
      * Détermine quels services doivent être construits.
      *
-     * @param Project $project Objet projet
+     * @param Project            $project          Objet projet
      * @param array<string>|null $selectedServices Services sélectionnés ou null pour tous
      *
      * @return array<AbstractContainer> Liste des services à construire
@@ -172,7 +164,6 @@ final readonly class BuildImageProjectService
             return $allServices;
         }
 
-        return array_filter($allServices, static fn(AbstractContainer $service): bool => \in_array($service->getFolderName(), $selectedServices, true));
+        return array_filter($allServices, static fn (AbstractContainer $service): bool => \in_array($service->getFolderName(), $selectedServices, true));
     }
-
 }

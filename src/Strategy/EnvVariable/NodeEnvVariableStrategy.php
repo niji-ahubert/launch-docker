@@ -19,7 +19,6 @@ class NodeEnvVariableStrategy extends AbstractEnvVariableStrategy
             'NODE_VERSION' => $serviceContainer->getDockerVersionService() ?? throw new \Exception('Version de Docker non définie'),
             'DOCKER_ENV' => $project->getEnvironmentContainer()->value,
         ];
-
     }
 
     /**

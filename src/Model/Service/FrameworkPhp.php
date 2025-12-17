@@ -17,6 +17,7 @@ final class FrameworkPhp extends AbstractFramework
 
     /**
      * @return FrameworkLanguagePhp|null
+     *
      * @phpstan-return FrameworkLanguageInterface<FrameworkLanguagePhp>|null
      */
     public function getFrameworkEnum(string $stringEnumValue): ?FrameworkLanguageInterface

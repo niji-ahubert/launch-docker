@@ -13,8 +13,7 @@ readonly class ServiceExternalModelToProjectTransformer
 {
     public function __construct(
         private ContainerServices $containerServices,
-    )
-    {
+    ) {
     }
 
     public function transform(ServiceExternalModel $model): AbstractContainer
@@ -30,6 +29,7 @@ readonly class ServiceExternalModelToProjectTransformer
         $serviceContainer->setDockerVersionService($model->getVersion());
         $serviceContainer->setDockerServiceName($model->getServiceName());
         $serviceContainer->setId($model->getId());
+
         return $serviceContainer;
     }
 
@@ -42,7 +42,7 @@ readonly class ServiceExternalModelToProjectTransformer
 
         $container = current(array_filter(
             $containers,
-            static fn(AbstractContainer $container): bool => $container->getId()->toRfc4122() === $uuid,
+            static fn (AbstractContainer $container): bool => $container->getId()->toRfc4122() === $uuid,
         ));
 
         if ($container) {

@@ -7,7 +7,6 @@ namespace App\Enum\Framework;
 use App\Enum\ServiceVersion\VersionFrameworkSupportedInterface;
 use App\Enum\ServiceVersion\VersionReactSupported;
 use App\Enum\UtilityTrait;
-
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 

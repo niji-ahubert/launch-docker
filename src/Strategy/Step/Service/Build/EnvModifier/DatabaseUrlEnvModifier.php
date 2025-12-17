@@ -69,22 +69,22 @@ final readonly class DatabaseUrlEnvModifier implements EnvModifierInterface
 
         // Construction du DSN
         // Format: protocol://user:pass@host:port/db
-        $dsn = sprintf(
+        $dsn = \sprintf(
             '%s://%s:%s@%s:%d/%s',
             $protocol,
             $user,
             $password,
             $host,
             $port,
-            $database
+            $database,
         );
 
         // Remplacement de la valeur DATABASE_URL
         // On cherche DATABASE_URL=... et on remplace
         return preg_replace(
             '/^DATABASE_URL=.*$/m',
-            sprintf('DATABASE_URL="%s"', $dsn),
-            $content
+            \sprintf('DATABASE_URL="%s"', $dsn),
+            $content,
         ) ?? $content;
     }
 }

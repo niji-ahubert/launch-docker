@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Util;
 
 final readonly class EnvVarUtility
 {
     /**
-     * @return array<string, string|int>
+     * @return array<string, int|string>
      */
     public static function loadEnvironmentVariables(string $envFile): array
     {

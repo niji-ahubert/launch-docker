@@ -17,8 +17,7 @@ readonly class EnvFileGeneratorService
     public function __construct(
         #[AutowireIterator(EnvVariableStrategyInterface::class)]
         private iterable $strategies,
-    )
-    {
+    ) {
     }
 
     /**
@@ -27,7 +26,6 @@ readonly class EnvFileGeneratorService
     public function generateSocleEnv(AbstractContainer $serviceContainer, Project $project): array
     {
         return $this->getStrategyForContainer($serviceContainer)->generateSocleEnvVariables($serviceContainer, $project);
-
     }
 
     public function generateEnvContent(AbstractContainer $serviceContainer, Project $project): string

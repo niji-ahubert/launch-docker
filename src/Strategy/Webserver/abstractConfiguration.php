@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Strategy\Webserver;
 
 use App\Model\Project;
@@ -16,14 +18,12 @@ abstract class abstractConfiguration
 
     public function __construct(
         protected FileSystemEnvironmentServices $fileSystemEnvironmentServices,
-        protected Generator                     $makerGenerator,
-        protected Filesystem                    $filesystem,
-    )
-    {
+        protected Generator $makerGenerator,
+        protected Filesystem $filesystem,
+    ) {
     }
 
-    abstract public function support(AbstractContainer $serviceContainer): bool;
-
-
     abstract public function __invoke(Project $project, AbstractContainer $serviceContainer): void;
+
+    abstract public function support(AbstractContainer $serviceContainer): bool;
 }

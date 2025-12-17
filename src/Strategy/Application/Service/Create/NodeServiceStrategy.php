@@ -10,7 +10,6 @@ use App\Enum\DockerAction;
 use App\Model\Service\AbstractContainer;
 use App\Strategy\Application\Service\AbstractServiceStrategy;
 
-
 /**
  * Stratégie de création de projet Node.js.
  *
@@ -18,13 +17,12 @@ use App\Strategy\Application\Service\AbstractServiceStrategy;
  */
 final readonly class NodeServiceStrategy extends AbstractServiceStrategy
 {
-
     public function getSteps(): array
     {
         return [
             ApplicationStep::NODE_INIT,
             ApplicationStep::NPM,
-            ApplicationStep::ACCESS_RIGHT
+            ApplicationStep::ACCESS_RIGHT,
         ];
     }
 

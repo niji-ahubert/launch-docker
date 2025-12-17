@@ -18,8 +18,6 @@ use App\Strategy\Application\Service\AbstractServiceStrategy;
  */
 final readonly class SymfonyServiceStrategy extends AbstractServiceStrategy
 {
-
-
     public function getSteps(): array
     {
         return [

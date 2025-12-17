@@ -19,12 +19,9 @@ use App\Strategy\Application\Service\Start\StartApplicationInterface;
  */
 abstract readonly class AbstractServiceStrategy implements CreateApplicationInterface, StartApplicationInterface
 {
-
-
     public function __construct(
-        protected StepServiceManagerService $stepManager
-    )
-    {
+        protected StepServiceManagerService $stepManager,
+    ) {
     }
 
     public function execute(AbstractContainer $serviceContainer, Project $project, DockerAction $dockerAction): void
@@ -37,7 +34,5 @@ abstract readonly class AbstractServiceStrategy implements CreateApplicationInte
      */
     abstract public function getSteps(): array;
 
-
     abstract public function supports(AbstractContainer $serviceContainer, DockerAction $dockerAction): bool;
-
 }

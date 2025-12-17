@@ -25,7 +25,6 @@ final class ContainerPgsql extends AbstractContainer implements ServiceContainer
         parent::__construct();
     }
 
-
     /**
      * @return VersionPgsqlSupported|null
      */

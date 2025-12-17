@@ -18,7 +18,6 @@ use App\Strategy\Application\Service\AbstractServiceStrategy;
  */
 final readonly class LaravelServiceStrategy extends AbstractServiceStrategy
 {
-
     /**
      * @return ApplicationStep[]
      */
@@ -33,7 +32,7 @@ final readonly class LaravelServiceStrategy extends AbstractServiceStrategy
             ApplicationStep::ENV_FILE,
             ApplicationStep::ACCESS_RIGHT,
             ApplicationStep::CONFIGURATION_WEBSERVER,
-            ApplicationStep::PHP_QUALITY
+            ApplicationStep::PHP_QUALITY,
         ];
     }
 

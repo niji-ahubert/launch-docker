@@ -11,5 +11,4 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 interface StartApplicationInterface extends ApplicationInterface
 {
     public const APP_START_APPLICATION_SERVICE_STRATEGY = 'app.start_application_service_strategy';
-    
 }

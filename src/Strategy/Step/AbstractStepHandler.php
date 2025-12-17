@@ -10,14 +10,13 @@ use App\Services\FileSystemEnvironmentServices;
 use App\Services\Mercure\MercureService;
 use App\Services\ProcessRunnerService;
 
-
 abstract class AbstractStepHandler
 {
-    public function __construct(protected FileSystemEnvironmentServices $fileSystemEnvironmentServices,
-                                protected MercureService                $mercureService,
-                                protected ProcessRunnerService          $processRunner
-    )
-    {
+    public function __construct(
+        protected FileSystemEnvironmentServices $fileSystemEnvironmentServices,
+        protected MercureService $mercureService,
+        protected ProcessRunnerService $processRunner,
+    ) {
     }
 
     /**

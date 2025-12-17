@@ -18,8 +18,7 @@ final readonly class ServiceExternalModelService
 {
     public function __construct(
         private ServiceExternalModelToProjectTransformer $serviceExternalModelTransformer,
-    )
-    {
+    ) {
     }
 
     public function support(TypeService $typeService): bool
@@ -47,5 +46,4 @@ final readonly class ServiceExternalModelService
     {
         return $this->serviceExternalModelTransformer->transform($model);
     }
-
 }

@@ -19,11 +19,10 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 abstract readonly class AbstractDockerService
 {
     public function __construct(
-        private DockerComposeFile               $dockerComposeFile,
-        private Generator                       $makerGenerator,
+        private DockerComposeFile $dockerComposeFile,
+        private Generator $makerGenerator,
         protected FileSystemEnvironmentServices $fileSystemEnvironmentServices,
-    )
-    {
+    ) {
     }
 
     public function __invoke(AbstractContainer $serviceContainer, Project $project): void
@@ -54,17 +53,17 @@ abstract readonly class AbstractDockerService
     abstract public function support(AbstractContainer $service): bool;
 
     /**
-     * @return array<string, array<int|string, string>|string>
-     * @throws RuntimeCommandException
-     *
-     */
-    abstract protected function getServiceSkeleton(string $volumeName, AbstractContainer $service, Project $project): array;
-
-    /**
      * @return string[]
      */
     public function getDefaultPorts(AbstractContainer $service): array
     {
         return [];
     }
+
+    /**
+     * @throws RuntimeCommandException
+     *
+     * @return array<string, array<int|string, string>|string>
+     */
+    abstract protected function getServiceSkeleton(string $volumeName, AbstractContainer $service, Project $project): array;
 }

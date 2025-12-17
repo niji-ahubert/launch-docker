@@ -11,7 +11,6 @@ use App\Enum\ServiceVersion\VersionFrameworkSupportedInterface;
 use App\Enum\ServiceVersion\VersionLaravelSupported;
 use Webmozart\Assert\Assert;
 
-
 final class FrameworkLaravel extends AbstractFramework
 {
     public function __construct()
@@ -25,6 +24,7 @@ final class FrameworkLaravel extends AbstractFramework
 
     /**
      * @return FrameworkLanguagePhp|null
+     *
      * @phpstan-return FrameworkLanguageInterface<FrameworkLanguagePhp>|null
      */
     public function getFrameworkEnum(string $stringEnumValue): ?FrameworkLanguageInterface

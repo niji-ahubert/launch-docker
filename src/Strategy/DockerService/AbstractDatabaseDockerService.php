@@ -15,15 +15,14 @@ use Symfony\Bundle\MakerBundle\Generator;
 abstract readonly class AbstractDatabaseDockerService extends AbstractDockerService implements DatabaseDockerServiceInterface
 {
     public function __construct(
-        protected string                $rootPassword,
-        protected string                $database,
-        protected string                $dbUser,
-        protected string                $dbPassword,
-        DockerComposeFile             $dockerComposeFile,
-        Generator                     $makerGenerator,
+        protected string $rootPassword,
+        protected string $database,
+        protected string $dbUser,
+        protected string $dbPassword,
+        DockerComposeFile $dockerComposeFile,
+        Generator $makerGenerator,
         FileSystemEnvironmentServices $fileSystemEnvironmentServices,
-    )
-    {
+    ) {
         parent::__construct($dockerComposeFile, $makerGenerator, $fileSystemEnvironmentServices);
     }
 

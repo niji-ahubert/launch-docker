@@ -15,27 +15,23 @@ use App\Services\StrategyManager\EnvFileGeneratorService;
 use App\Strategy\Step\AbstractBuildServiceStepHandler;
 use Symfony\Bundle\MakerBundle\Generator;
 
-
 final class EnvFileDockerServiceStepHandler extends AbstractBuildServiceStepHandler
 {
     public function __construct(
-        FileSystemEnvironmentServices   $fileSystemEnvironmentServices,
-        private readonly Generator               $makerGenerator,
+        FileSystemEnvironmentServices $fileSystemEnvironmentServices,
+        private readonly Generator $makerGenerator,
         private readonly EnvFileGeneratorService $envFileGeneratorService,
-        MercureService                  $mercureService,
-        ProcessRunnerService            $processRunner,
-
-    )
-    {
+        MercureService $mercureService,
+        ProcessRunnerService $processRunner,
+    ) {
         parent::__construct($fileSystemEnvironmentServices, $mercureService, $processRunner);
     }
 
     public function __invoke(AbstractContainer $serviceContainer, Project $project): void
     {
-
         $this->mercureService->dispatch(
             message: '📦 Création mise à jour des .env',
-            type: TypeLog::START
+            type: TypeLog::START,
         );
 
         $configPath = $this->fileSystemEnvironmentServices->getConfigPath($project);
@@ -50,7 +46,7 @@ final class EnvFileDockerServiceStepHandler extends AbstractBuildServiceStepHand
         $this->mercureService->dispatch(
             message: '✅ Création mise à jour des .env success',
             type: TypeLog::COMPLETE,
-            exitCode: 0
+            exitCode: 0,
         );
     }
 

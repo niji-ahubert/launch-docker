@@ -25,7 +25,7 @@ trait ExecuteInContainerTrait
 
     // Ces propriétés sont présumées exister dans la classe utilisatrice ou son parent.
     // Si ce n'est pas le cas, elles seront définies dynamiquement (mais c'est moins propre pour l'IDE).
-    // Pour éviter les conflits de définition avec AbstractStepHandler, on ne les re-déclare pas ici 
+    // Pour éviter les conflits de définition avec AbstractStepHandler, on ne les re-déclare pas ici
     // explicitement comme propriétés, mais on compte sur les setters pour l'injection.
 
     #[Required]
@@ -55,11 +55,12 @@ trait ExecuteInContainerTrait
     /**
      * Exécute une commande à l'intérieur du container Docker du service.
      *
-     * @param Project $project Le projet
-     * @param AbstractContainer $service Le service container
-     * @param string[] $command La commande à exécuter (ex: ['composer', 'install'])
-     * @param string $logMessage Message de log pour l'exécution
-     * @param bool $rootMode Exécuter en tant que root
+     * @param Project           $project    Le projet
+     * @param AbstractContainer $service    Le service container
+     * @param string[]          $command    La commande à exécuter (ex: ['composer', 'install'])
+     * @param string            $logMessage Message de log pour l'exécution
+     * @param bool              $rootMode   Exécuter en tant que root
+     *
      * @throws ProcessFailedException Si la commande échoue
      */
     protected function executeInContainer(
@@ -67,14 +68,14 @@ trait ExecuteInContainerTrait
         AbstractContainer $service,
         array $command,
         string $logMessage,
-        bool $rootMode = false
+        bool $rootMode = false,
     ): int {
         $workdir = $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $service);
 
-        $commandShell = sprintf(
+        $commandShell = \sprintf(
             'cd %s && %s',
             $workdir,
-            implode(' ', array_map('escapeshellarg', $command))
+            implode(' ', array_map('escapeshellarg', $command)),
         );
 
         $dockerCommand = [
@@ -90,12 +91,12 @@ trait ExecuteInContainerTrait
             '-T',
             ...($rootMode ? ['-u', 'root'] : []),
             DockerComposeUtility::getProjectServiceName($project, $service),
-            'sh', '-c', $commandShell
+            'sh', '-c', $commandShell,
         ];
 
         $exitCode = $this->processRunner->run($dockerCommand, $logMessage, $this->projectDir);
 
-        if ($exitCode !== 0) {
+        if (0 !== $exitCode) {
             throw new ProcessFailedException(new Process($dockerCommand));
         }
 

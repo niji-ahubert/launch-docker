@@ -22,9 +22,8 @@ final readonly class WebServerUpdateSubscriber implements EventSubscriberInterfa
 {
     public function __construct(
         private WebServerUpdateService $webServerUpdateService,
-        private LoggerInterface        $logger,
-    )
-    {
+        private LoggerInterface $logger,
+    ) {
     }
 
     /**
@@ -54,20 +53,16 @@ final readonly class WebServerUpdateSubscriber implements EventSubscriberInterfa
 
         $this->logger->info('Mise à jour du projet utilisant le webserver supprimé', [
             'webserver' => $webServerName,
-            'project' => sprintf('%s/%s', $project->getClient(), $project->getProject()),
+            'project' => \sprintf('%s/%s', $project->getClient(), $project->getProject()),
         ]);
 
         try {
             // Mettre à jour uniquement le projet actuel
             $updateResult = $this->webServerUpdateService->updateSingleProjectWebServer(
                 $webServerName,
-                $project
+                $project,
             );
-
-
         } catch (\Exception $exception) {
-
-
             $this->logger->error('Erreur lors de la mise à jour des projets', [
                 'webserver' => $webServerName,
                 'error' => $exception->getMessage(),
@@ -75,5 +70,4 @@ final readonly class WebServerUpdateSubscriber implements EventSubscriberInterfa
             ]);
         }
     }
-
 }

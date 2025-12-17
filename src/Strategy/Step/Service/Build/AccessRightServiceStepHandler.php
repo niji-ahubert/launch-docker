@@ -15,25 +15,24 @@ use App\Strategy\Step\AbstractBuildServiceStepHandler;
 
 final class AccessRightServiceStepHandler extends AbstractBuildServiceStepHandler
 {
-    public function __construct(FileSystemEnvironmentServices $fileSystemEnvironmentServices,
-                                MercureService                $mercureService,
-                                ProcessRunnerService          $processRunner,
-                                private readonly ProcessRunnerService  $processRunnerService)
-    {
+    public function __construct(
+        FileSystemEnvironmentServices $fileSystemEnvironmentServices,
+        MercureService $mercureService,
+        ProcessRunnerService $processRunner,
+        private readonly ProcessRunnerService $processRunnerService,
+    ) {
         parent::__construct($fileSystemEnvironmentServices, $mercureService, $processRunner);
     }
 
     public function __invoke(AbstractContainer $serviceContainer, Project $project): void
     {
-
         if ($serviceContainer->getServiceContainer() instanceof ServiceContainer) {
             return;
         }
 
-
         $cmdShell = 'find . -type d -exec chmod 775 {} + && find . -type f -exec chmod 664 {} + ';
         $command = [
-            'sh', '-c', $cmdShell
+            'sh', '-c', $cmdShell,
         ];
 
         $this->processRunnerService->run($command, '📦 fix Access Right', $this->fileSystemEnvironmentServices->getPathClient($project->getClient()));

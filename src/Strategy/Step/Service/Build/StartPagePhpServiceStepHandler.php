@@ -19,24 +19,21 @@ final class StartPagePhpServiceStepHandler extends AbstractBuildServiceStepHandl
 {
     public function __construct(
         FileSystemEnvironmentServices $fileSystemEnvironmentServices,
-        MercureService                $mercureService,
-        ProcessRunnerService          $processRunner,
-        private readonly Generator             $makerGenerator
-    )
-    {
+        MercureService $mercureService,
+        ProcessRunnerService $processRunner,
+        private readonly Generator $makerGenerator,
+    ) {
         parent::__construct($fileSystemEnvironmentServices, $mercureService, $processRunner);
     }
 
     public function __invoke(AbstractContainer $serviceContainer, Project $project): void
     {
-
-
         $this->mercureService->dispatch(
-            message: '📦 Création du fichier index.php'
+            message: '📦 Création du fichier index.php',
         );
         $pathApplicationProject = $this->fileSystemEnvironmentServices->getProjectComponentPath($project, $serviceContainer);
 
-        $indexFolder = $pathApplicationProject . '/index.php';
+        $indexFolder = $pathApplicationProject.'/index.php';
         $content = $this->fileSystemEnvironmentServices->getSkeletonFile('index.php.tpl');
         Assert::string($content);
         $this->makerGenerator->dumpFile($indexFolder, $content);
@@ -45,7 +42,7 @@ final class StartPagePhpServiceStepHandler extends AbstractBuildServiceStepHandl
         $this->mercureService->dispatch(
             message: '✅ Création du fichier index.php terminé avec succès',
             type: TypeLog::COMPLETE,
-            exitCode: 0
+            exitCode: 0,
         );
     }
 

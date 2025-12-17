@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Util;
 
 use App\Enum\ContainerType\ProjectContainer;
@@ -9,11 +11,8 @@ use App\Model\Service\AbstractContainer;
 use App\Model\Service\ServiceContainerInterface;
 use Symfony\Component\Process\Process;
 
-/** @package App\Util */
 final readonly class DockerUtility
 {
-
-
     public static function getFinalTagName(Project $project, AbstractContainer $service): string
     {
         return \sprintf(
@@ -28,21 +27,21 @@ final readonly class DockerUtility
     /**
      * Récupère les logs d'un container Docker Compose.
      *
-     * @param Project $project Le projet contenant les informations Docker
-     * @param string $serviceName Le nom du service dont on veut les logs
-     * @param string $dockerComposeFilePath Le chemin vers le fichier docker-compose.yml
-     * @param bool $follow Suivre les logs en temps réel (défaut: false)
-     * @param int|null $tail Nombre de lignes à afficher (défaut: toutes)
+     * @param Project  $project               Le projet contenant les informations Docker
+     * @param string   $serviceName           Le nom du service dont on veut les logs
+     * @param string   $dockerComposeFilePath Le chemin vers le fichier docker-compose.yml
+     * @param bool     $follow                Suivre les logs en temps réel (défaut: false)
+     * @param int|null $tail                  Nombre de lignes à afficher (défaut: toutes)
+     *
      * @return string Les logs du container
      */
     public static function getLogContainer(
         Project $project,
-        string  $serviceName,
-        string  $dockerComposeFilePath,
-        bool    $follow = false,
-        ?int    $tail = null
-    ): string
-    {
+        string $serviceName,
+        string $dockerComposeFilePath,
+        bool $follow = false,
+        ?int $tail = null,
+    ): string {
         $command = [
             'docker',
             '--log-level=ERROR',
@@ -58,9 +57,9 @@ final readonly class DockerUtility
             $command[] = '--follow';
         }
 
-        if ($tail !== null) {
+        if (null !== $tail) {
             $command[] = '--tail';
-            $command[] = (string)$tail;
+            $command[] = (string) $tail;
         }
 
         $command[] = $serviceName;
@@ -88,7 +87,7 @@ final readonly class DockerUtility
 
     public static function getProjectName(Project $project): string
     {
-        return sprintf('%s-%s', $project->getClient(), $project->getProject());
+        return \sprintf('%s-%s', $project->getClient(), $project->getProject());
     }
 
     public static function getDockerfileVariable(AbstractContainer $serviceContainer, Project $project): ?DockerData
@@ -105,7 +104,6 @@ final readonly class DockerUtility
 
         return null;
     }
-
 
     public static function getPhpDockerfileVariable(AbstractContainer $serviceContainer, Project $project, string $tagVersion = 'latest'): DockerData
     {
@@ -131,19 +129,19 @@ final readonly class DockerUtility
 
                 return $extensions;
             },
-            []
+            [],
         );
 
         $phpExtensions = implode(
             ' ',
             array_unique(
-                array_filter(array_merge($extensionsRequired, $extensionsFromFramework, $serviceContainersExtensions))
-            )
+                array_filter(array_merge($extensionsRequired, $extensionsFromFramework, $serviceContainersExtensions)),
+            ),
         );
 
         $image_name = \sprintf('socle-php-%s-%s', $phpVersion, $env);
-        return new DockerData(image_name: $image_name, tag_version: $tagVersion, from_statement: \sprintf('FROM %s:%s AS stage_dev', $image_name, $tagVersion), extensions_selected: $phpExtensions);
 
+        return new DockerData(image_name: $image_name, tag_version: $tagVersion, from_statement: \sprintf('FROM %s:%s AS stage_dev', $image_name, $tagVersion), extensions_selected: $phpExtensions);
     }
 
     public static function getNodeDockerfileVariable(AbstractContainer $serviceContainer, Project $project, string $tagVersion = 'latest'): DockerData
@@ -152,13 +150,12 @@ final readonly class DockerUtility
         $env = $project->getEnvironmentContainer()->value;
         $nodeServices = array_filter(
             $project->getServiceContainer(),
-            static fn($service): bool => ProjectContainer::NODE === $service->getServiceContainer(),
+            static fn ($service): bool => ProjectContainer::NODE === $service->getServiceContainer(),
         );
 
         $index = array_search($serviceContainer, array_values($nodeServices), true);
         $image_name = \sprintf('socle-node-%s-%s', $nodeVersion, $env);
+
         return new DockerData(image_name: $image_name, tag_version: $tagVersion, from_statement: \sprintf('FROM %s:%s AS stage_dev', $image_name, $tagVersion), port: 3000 + $index);
-
     }
-
 }

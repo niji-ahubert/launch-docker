@@ -10,6 +10,7 @@ use App\Enum\Log\TypeLog;
 use App\Model\Project;
 use App\Model\Service\AbstractContainer;
 use App\Services\Mercure\MercureService;
+use App\Strategy\Application\Service\AbstractServiceStrategy;
 use Monolog\Level;
 
 /**
@@ -25,14 +26,14 @@ use Monolog\Level;
  */
 abstract class AbstractApplicationService
 {
-
     protected MercureService $mercureService;
-    /** @var iterable<\App\Strategy\Application\Service\AbstractServiceStrategy> */
-    protected iterable $strategies;
 
+    /** @var iterable<AbstractServiceStrategy> */
+    protected iterable $strategies;
 
     /**
      * Exécute la création d'application et retourne un générateur d'événements (mode web SSE).
+     *
      * @throws \ReflectionException
      */
     public function __invoke(AbstractContainer $serviceContainer, Project $project, DockerAction $dockerAction): void
@@ -53,8 +54,9 @@ abstract class AbstractApplicationService
                 message: $runtimeException->getMessage(),
                 type: TypeLog::ERROR,
                 level: Level::Error,
-                error: $runtimeException->getMessage()
+                error: $runtimeException->getMessage(),
             );
+
             throw $runtimeException;
         }
     }

@@ -11,10 +11,8 @@ use App\Strategy\Step\AbstractStartServiceStepHandler;
 
 final class PhpQualitySymfonyServiceStepHandler extends AbstractStartServiceStepHandler
 {
-
     public function __invoke(AbstractContainer $serviceContainer, Project $project): void
     {
-        
         $installCmd = [
             'composer',
             'require',
@@ -24,7 +22,6 @@ final class PhpQualitySymfonyServiceStepHandler extends AbstractStartServiceStep
         ];
 
         $this->executeInContainer($project, $serviceContainer, $installCmd, '📦 Ajout des composants de qualités');
-
     }
 
     public static function getPriority(): int

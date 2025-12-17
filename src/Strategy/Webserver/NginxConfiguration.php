@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Strategy\Webserver;
 
 use App\Enum\ContainerType\ProjectContainer;
@@ -8,16 +10,8 @@ use App\Model\Project;
 use App\Model\Service\AbstractContainer;
 use App\Util\DockerComposeUtility;
 
-final  class NginxConfiguration extends abstractConfiguration
+final class NginxConfiguration extends abstractConfiguration
 {
-
-
-    public function support(AbstractContainer $serviceContainer): bool
-    {
-        return $serviceContainer->getServiceContainer() === ProjectContainer::PHP
-            && $serviceContainer->getWebServer()?->getWebServer() === WebServer::NGINX;
-    }
-
     public function __invoke(Project $project, AbstractContainer $serviceContainer): void
     {
         $webserverConfigPath = $this->fileSystemEnvironmentServices->getApplicationNginxConfigPath($project, $serviceContainer);
@@ -38,4 +32,9 @@ final  class NginxConfiguration extends abstractConfiguration
         $this->makerGenerator->writeChanges();
     }
 
+    public function support(AbstractContainer $serviceContainer): bool
+    {
+        return ProjectContainer::PHP === $serviceContainer->getServiceContainer()
+            && WebServer::NGINX === $serviceContainer->getWebServer()?->getWebServer();
+    }
 }

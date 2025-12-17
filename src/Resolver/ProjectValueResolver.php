@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Resolver;
 
 use App\Attribute\EnrichedProject;
@@ -12,9 +14,8 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 final readonly class ProjectValueResolver implements ValueResolverInterface
 {
     public function __construct(
-        private FileSystemEnvironmentServices $environmentServices
-    )
-    {
+        private FileSystemEnvironmentServices $environmentServices,
+    ) {
     }
 
     /**
@@ -22,7 +23,7 @@ final readonly class ProjectValueResolver implements ValueResolverInterface
      */
     public function resolve(Request $request, ArgumentMetadata $argument): \Generator
     {
-        if ($argument->getType() !== Project::class) {
+        if (Project::class !== $argument->getType()) {
             return [];
         }
 
@@ -38,7 +39,7 @@ final readonly class ProjectValueResolver implements ValueResolverInterface
         $project->setProject($projectName);
 
         $attributes = $argument->getAttributes(EnrichedProject::class);
-        if ($attributes !== []) {
+        if ([] !== $attributes) {
             $project = $this->environmentServices->loadEnvironments($project);
         }
 

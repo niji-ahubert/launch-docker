@@ -30,18 +30,18 @@ final class EntrypointAddonCopyDockerServiceStepHandler extends AbstractBuildSer
     {
         $this->mercureService->dispatch(
             message: '📦 Copie du script entrypoint addon',
-            type: TypeLog::START
+            type: TypeLog::START,
         );
 
         $this->filesystem->copy(
-            sprintf('%s/%s', $this->projectDir, FileSystemEnvironmentServices::BIN_ENTRYPOINT_ADDON_SH),
-            $this->fileSystemEnvironmentServices->getProjectComponentEntrypointAddonPath($project, $serviceContainer)
+            \sprintf('%s/%s', $this->projectDir, FileSystemEnvironmentServices::BIN_ENTRYPOINT_ADDON_SH),
+            $this->fileSystemEnvironmentServices->getProjectComponentEntrypointAddonPath($project, $serviceContainer),
         );
 
         $this->mercureService->dispatch(
             message: '✅ Copie du script entrypoint addon success',
             type: TypeLog::COMPLETE,
-            exitCode: 0
+            exitCode: 0,
         );
     }
 

@@ -12,47 +12,45 @@ use App\Strategy\Step\AbstractStartServiceStepHandler;
 
 final class ComposerInstallServiceStepHandler extends AbstractStartServiceStepHandler
 {
-
     public function __invoke(AbstractContainer $serviceContainer, Project $project): void
     {
         $this->mercureService->dispatch(
             message: 'Installation des dépendances Composer',
-            type: TypeLog::START
+            type: TypeLog::START,
         );
 
         // Clear composer cache to prevent corrupted archive issues
         $this->mercureService->dispatch(
-            message: '🧹 Nettoyage du cache Composer'
+            message: '🧹 Nettoyage du cache Composer',
         );
-//
-//        $clearCacheCmd = [
-//            'composer',
-//            'clear-cache',
-//        ];
-//
-//        try {
-//            $this->executeInContainer($project, $serviceContainer, $clearCacheCmd, '🧹 Nettoyage du cache');
-//        } catch (\Exception $e) {
-//            // Continue even if cache clear fails
-//            $this->mercureService->dispatch(
-//                message: '⚠️ Impossible de nettoyer le cache, continuation...'
-//            );
-//        }
-//
-//        $this->mercureService->dispatch(
-//            message: '📦 Installation des dépendances'
-//        );
-//
-//        $composerCmd = [
-//            'composer',
-//            'install',
-//            '--no-scripts',
-//            '--prefer-dist',
-//            '--no-interaction',
-//        ];
-//
-//        $this->executeInContainer($project, $serviceContainer, $composerCmd, '⚙️ Installation des vendor');
-
+        //
+        //        $clearCacheCmd = [
+        //            'composer',
+        //            'clear-cache',
+        //        ];
+        //
+        //        try {
+        //            $this->executeInContainer($project, $serviceContainer, $clearCacheCmd, '🧹 Nettoyage du cache');
+        //        } catch (\Exception $e) {
+        //            // Continue even if cache clear fails
+        //            $this->mercureService->dispatch(
+        //                message: '⚠️ Impossible de nettoyer le cache, continuation...'
+        //            );
+        //        }
+        //
+        //        $this->mercureService->dispatch(
+        //            message: '📦 Installation des dépendances'
+        //        );
+        //
+        //        $composerCmd = [
+        //            'composer',
+        //            'install',
+        //            '--no-scripts',
+        //            '--prefer-dist',
+        //            '--no-interaction',
+        //        ];
+        //
+        //        $this->executeInContainer($project, $serviceContainer, $composerCmd, '⚙️ Installation des vendor');
     }
 
     public static function getPriority(): int

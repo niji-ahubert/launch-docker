@@ -11,7 +11,6 @@ use App\Enum\Framework\FrameworkLanguagePhp;
 use App\Model\Service\AbstractContainer;
 use App\Strategy\Application\Service\AbstractServiceStrategy;
 
-
 /**
  * Stratégie de création de projet PHP vanilla.
  *
@@ -19,15 +18,13 @@ use App\Strategy\Application\Service\AbstractServiceStrategy;
  */
 final readonly class PhpServiceStrategy extends AbstractServiceStrategy
 {
-
-
     public function getSteps(): array
     {
         return [
             ApplicationStep::COMPOSER_INIT,
             ApplicationStep::COMPOSER,
             ApplicationStep::ACCESS_RIGHT,
-            ApplicationStep::CONFIGURATION_WEBSERVER
+            ApplicationStep::CONFIGURATION_WEBSERVER,
         ];
     }
 

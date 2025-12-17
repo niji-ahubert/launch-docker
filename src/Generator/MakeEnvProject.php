@@ -31,13 +31,11 @@ use Webmozart\Assert\Assert;
 final class MakeEnvProject extends AbstractMaker
 {
     public function __construct(
-        private readonly Project                       $projectEnvironment,
+        private readonly Project $projectEnvironment,
         private readonly FileSystemEnvironmentServices $fileSystemEnvironmentServices,
-        private readonly ProjectGenerationService      $projectGenerationService,
-
-        private readonly SluggerInterface              $slugger,
-    )
-    {
+        private readonly ProjectGenerationService $projectGenerationService,
+        private readonly SluggerInterface $slugger,
+    ) {
     }
 
     public static function getCommandName(): string
@@ -56,7 +54,7 @@ final class MakeEnvProject extends AbstractMaker
             ->addOption('client', 'c', InputOption::VALUE_REQUIRED, 'Client name')
             ->addOption('project', 'p', InputOption::VALUE_REQUIRED, 'Project name');
 
-        if (($file = file_get_contents(__DIR__ . '/MakeEnvProject.txt')) !== false) {
+        if (($file = file_get_contents(__DIR__.'/MakeEnvProject.txt')) !== false) {
             $command
                 ->setHelp($file);
         }
@@ -77,12 +75,11 @@ final class MakeEnvProject extends AbstractMaker
         // Get client name from option or ask interactively
         $clientOption = $input->getOption('client');
         $projectOption = $input->getOption('project');
-        $this->projectEnvironment->setClient($this->slugger->slug((string)$clientOption)->toString());
-        $this->projectEnvironment->setProject($this->slugger->slug((string)$projectOption)->toString());
+        $this->projectEnvironment->setClient($this->slugger->slug((string) $clientOption)->toString());
+        $this->projectEnvironment->setProject($this->slugger->slug((string) $projectOption)->toString());
 
         $loadedProject = $this->fileSystemEnvironmentServices->loadEnvironments($this->projectEnvironment);
         Assert::isInstanceOf($loadedProject, Project::class);
         $this->projectGenerationService->generateCompleteProject($loadedProject);
-
     }
 }

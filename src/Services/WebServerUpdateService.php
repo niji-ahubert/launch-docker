@@ -7,7 +7,6 @@ namespace App\Services;
 use App\Enum\WebServer;
 use App\Model\Project;
 use App\Model\Service\AbstractContainer;
-use App\Services\FileSystemEnvironmentServices;
 
 /**
  * Service pour mettre à jour les webservers des projets.
@@ -19,16 +18,16 @@ use App\Services\FileSystemEnvironmentServices;
 final readonly class WebServerUpdateService
 {
     public function __construct(
-        private FileSystemEnvironmentServices $environmentServices
-    )
-    {
+        private FileSystemEnvironmentServices $environmentServices,
+    ) {
     }
 
     /**
      * Met à jour le projet spécifié pour utiliser le webserver local.
      *
-     * @param string $webServerName Nom du webserver supprimé (nginx, apache)
-     * @param Project $project Projet à mettre à jour
+     * @param string  $webServerName Nom du webserver supprimé (nginx, apache)
+     * @param Project $project       Projet à mettre à jour
+     *
      * @return array{updated: int, projects: array<string>} Statistiques de mise à jour
      */
     public function updateSingleProjectWebServer(string $webServerName, Project $project): array
@@ -48,9 +47,8 @@ final readonly class WebServerUpdateService
             if ($hasUpdates) {
                 $this->environmentServices->saveEnvironments($project);
                 $updatedCount++;
-                $updatedProjects[] = sprintf('%s/%s', $project->getClient(), $project->getProject());
+                $updatedProjects[] = \sprintf('%s/%s', $project->getClient(), $project->getProject());
             }
-
         } catch (\Exception) {
             // En cas d'erreur, on retourne les statistiques vides
         }

@@ -32,13 +32,11 @@ use Symfony\Component\Process\Process;
 final readonly class StartProjectService
 {
     public function __construct(
-        private ProcessRunnerService          $processRunnerService,
+        private ProcessRunnerService $processRunnerService,
         private FileSystemEnvironmentServices $fileSystemEnvironmentServices,
-        private MercureService                $mercureService,
-
-        private string                        $projectDir
-    )
-    {
+        private MercureService $mercureService,
+        private string $projectDir,
+    ) {
     }
 
     public function startProject(Project $project, bool $onlyProjectService = false, bool $detach = true): void
@@ -50,7 +48,6 @@ final readonly class StartProjectService
 
         foreach ($project->getServiceContainer() as $service) {
             try {
-
                 if (!$service->getServiceContainer() instanceof ProjectContainer) {
                     continue;
                 }
@@ -63,12 +60,11 @@ final readonly class StartProjectService
                 // };
                 $startedServices++;
             } catch (ProcessFailedException $e) {
-
                 $this->mercureService->dispatch(
-                    message: sprintf('❌ Échec du démarrage pour le service: %s', $service->getFolderName()),
+                    message: \sprintf('❌ Échec du démarrage pour le service: %s', $service->getFolderName()),
                     type: TypeLog::ERROR,
                     level: Level::Error,
-                    error: $e->getMessage()
+                    error: $e->getMessage(),
                 );
             }
         }
@@ -80,78 +76,16 @@ final readonly class StartProjectService
         );
     }
 
-    private function startService(Project $project, AbstractContainer $service, bool $detach = true): void
-    {
-
-        if (!$this->fileSystemEnvironmentServices->componentEnvFileExist($project, $service)) {
-            $warningMessage = \sprintf('❌ Fichier d\'environnement non trouvé: %s', $this->fileSystemEnvironmentServices->getComponentEnvFile($project, $service));
-            $this->mercureService->dispatch(
-                message: $warningMessage,
-                type: TypeLog::ERROR,
-                level: Level::Error
-            );
-            return;
-        }
-
-        $imageName = DockerUtility::getFinalTagName($project, $service);
-        if (!DockerUtility::dockerImageExists($imageName)) {
-            $errorMessage = \sprintf('❌ Image Docker non trouvée: %s', $imageName);
-            $this->mercureService->dispatch(
-                message: $errorMessage,
-                type: TypeLog::ERROR,
-                level: Level::Error
-            );
-
-            return;
-        }
-
-
-        $command = [
-            'docker',
-            '--log-level=ERROR',
-            'compose',
-            '--profile',
-            'runner-dev',
-            '--project-name',
-            DockerUtility::getProjectName($project),
-            '-f',
-            $this->fileSystemEnvironmentServices->getDockerComposeFilePath($project),
-            'up',
-        ];
-
-        if ($detach) {
-            $command[] = '--detach';
-        }
-
-      //  $command[] = DockerComposeUtility::getProjectServiceName($project, $service);
-
-
-        $this->processRunnerService->run(
-            $command,
-            sprintf('Start Service %s', $service->getFolderName()),
-            $this->projectDir,
-            env: EnvVarUtility::loadEnvironmentVariables($this->fileSystemEnvironmentServices->getComponentEnvFile($project, $service))
-        );
-
-
-        if (ServiceContainerUtility::isSymfonyDevService($service, $project->getEnvironmentContainer())) {
-
-            $this->mercureService->dispatch(
-                message: ServiceContainerUtility::getSymfonyDebugMessage(),
-            );
-        }
-    }
-
     public function waitForServiceToBeReady(Project $project, AbstractContainer $service, int $timeoutSeconds = 60): void
     {
         $serviceName = match (true) {
             $service->getServiceContainer() instanceof ProjectContainer => DockerComposeUtility::getProjectServiceName($project, $service),
-            default => $service->getServiceContainer()->value
+            default => $service->getServiceContainer()->value,
         };
 
         $this->mercureService->dispatch(
-            message: sprintf('⏳ Vérification du statut du service: %s', $serviceName),
-            type: TypeLog::START
+            message: \sprintf('⏳ Vérification du statut du service: %s', $serviceName),
+            type: TypeLog::START,
         );
 
         $startTime = time();
@@ -171,31 +105,33 @@ final readonly class StartProjectService
                 'ps',
                 '--format',
                 'json',
-                $serviceName
+                $serviceName,
             ];
 
             try {
                 $exitCode = $this->processRunnerService->run(
                     $command,
-                    sprintf('🔍 Vérification du service %s', $serviceName),
-                    $this->projectDir
+                    \sprintf('🔍 Vérification du service %s', $serviceName),
+                    $this->projectDir,
                 );
 
-                if ($exitCode === 0) {
+                if (0 === $exitCode) {
                     // Le service existe et répond, on considère qu'il est prêt
                     $this->mercureService->dispatch(
-                        message: sprintf('✅ Service %s est prêt et opérationnel', $serviceName),
-                        type: TypeLog::COMPLETE
+                        message: \sprintf('✅ Service %s est prêt et opérationnel', $serviceName),
+                        type: TypeLog::COMPLETE,
                     );
+
                     return;
                 }
             } catch (ProcessFailedException $e) {
                 // Si la commande échoue, le service pourrait être en erreur
                 $this->mercureService->dispatch(
-                    message: sprintf('❌ Erreur lors de la vérification du service %s: %s', $serviceName, $e->getMessage()),
+                    message: \sprintf('❌ Erreur lors de la vérification du service %s: %s', $serviceName, $e->getMessage()),
                     type: TypeLog::ERROR,
-                    level: Level::Error
+                    level: Level::Error,
                 );
+
                 throw $e;
             }
 
@@ -203,24 +139,83 @@ final readonly class StartProjectService
             $remainingTime = $timeoutSeconds - (time() - $startTime);
             if ($remainingTime > 0) {
                 $this->mercureService->dispatch(
-                    message: sprintf('⏳ Service %s pas encore prêt, nouvelle vérification dans %d secondes (timeout dans %d secondes)',
+                    message: \sprintf(
+                        '⏳ Service %s pas encore prêt, nouvelle vérification dans %d secondes (timeout dans %d secondes)',
                         $serviceName,
                         min($checkInterval, $remainingTime),
-                        $remainingTime
-                    )
+                        $remainingTime,
+                    ),
                 );
                 sleep(min($checkInterval, $remainingTime));
             }
         }
 
         // Timeout atteint
-        $errorMessage = sprintf('❌ Timeout: Le service %s n\'est pas devenu opérationnel après %d secondes', $serviceName, $timeoutSeconds);
+        $errorMessage = \sprintf('❌ Timeout: Le service %s n\'est pas devenu opérationnel après %d secondes', $serviceName, $timeoutSeconds);
         $this->mercureService->dispatch(
             message: $errorMessage,
             type: TypeLog::ERROR,
-            level: Level::Error
+            level: Level::Error,
         );
 
         throw new ProcessFailedException(new Process($command));
+    }
+
+    private function startService(Project $project, AbstractContainer $service, bool $detach = true): void
+    {
+        if (!$this->fileSystemEnvironmentServices->componentEnvFileExist($project, $service)) {
+            $warningMessage = \sprintf('❌ Fichier d\'environnement non trouvé: %s', $this->fileSystemEnvironmentServices->getComponentEnvFile($project, $service));
+            $this->mercureService->dispatch(
+                message: $warningMessage,
+                type: TypeLog::ERROR,
+                level: Level::Error,
+            );
+
+            return;
+        }
+
+        $imageName = DockerUtility::getFinalTagName($project, $service);
+        if (!DockerUtility::dockerImageExists($imageName)) {
+            $errorMessage = \sprintf('❌ Image Docker non trouvée: %s', $imageName);
+            $this->mercureService->dispatch(
+                message: $errorMessage,
+                type: TypeLog::ERROR,
+                level: Level::Error,
+            );
+
+            return;
+        }
+
+        $command = [
+            'docker',
+            '--log-level=ERROR',
+            'compose',
+            '--profile',
+            'runner-dev',
+            '--project-name',
+            DockerUtility::getProjectName($project),
+            '-f',
+            $this->fileSystemEnvironmentServices->getDockerComposeFilePath($project),
+            'up',
+        ];
+
+        if ($detach) {
+            $command[] = '--detach';
+        }
+
+        //  $command[] = DockerComposeUtility::getProjectServiceName($project, $service);
+
+        $this->processRunnerService->run(
+            $command,
+            \sprintf('Start Service %s', $service->getFolderName()),
+            $this->projectDir,
+            env: EnvVarUtility::loadEnvironmentVariables($this->fileSystemEnvironmentServices->getComponentEnvFile($project, $service)),
+        );
+
+        if (ServiceContainerUtility::isSymfonyDevService($service, $project->getEnvironmentContainer())) {
+            $this->mercureService->dispatch(
+                message: ServiceContainerUtility::getSymfonyDebugMessage(),
+            );
+        }
     }
 }

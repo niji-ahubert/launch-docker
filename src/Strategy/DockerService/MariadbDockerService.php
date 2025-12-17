@@ -16,18 +16,17 @@ final readonly class MariadbDockerService extends AbstractDatabaseDockerService
 {
     public function __construct(
         #[Autowire(param: 'bdd.root_password')]
-        string                        $rootPassword,
+        string $rootPassword,
         #[Autowire(param: 'bdd.database')]
-        string                        $database,
+        string $database,
         #[Autowire(param: 'bdd.user')]
-        string                        $dbUser,
+        string $dbUser,
         #[Autowire(param: 'bdd.password')]
-        string                        $dbPassword,
-        DockerComposeFile             $dockerComposeFile,
-        Generator                     $makerGenerator,
+        string $dbPassword,
+        DockerComposeFile $dockerComposeFile,
+        Generator $makerGenerator,
         FileSystemEnvironmentServices $fileSystemEnvironmentServices,
-    )
-    {
+    ) {
         parent::__construct($rootPassword, $database, $dbUser, $dbPassword, $dockerComposeFile, $makerGenerator, $fileSystemEnvironmentServices);
     }
 
@@ -42,15 +41,19 @@ final readonly class MariadbDockerService extends AbstractDatabaseDockerService
         return ['3306'];
     }
 
+    public function getDsnProtocol(): string
+    {
+        return ServiceContainer::MYSQL->value;
+    }
+
     protected function getServiceSkeleton(string $volumeName, AbstractContainer $service, Project $project): array
     {
-
         return [
             'image' => \sprintf('%s:%s', ServiceContainer::MARIADB->getValue(), $service->getDockerVersionService()),
-            'container_name' => sprintf('%s_service_database', ServiceContainer::MARIADB->getValue()),
+            'container_name' => \sprintf('%s_service_database', ServiceContainer::MARIADB->getValue()),
             'profiles' => ['runner-dev'],
             'networks' => ['traefik'],
-            'volumes' => [sprintf('%s:/var/lib/mysql', $volumeName)],
+            'volumes' => [\sprintf('%s:/var/lib/mysql', $volumeName)],
             'environment' => [
                 'MYSQL_ROOT_PASSWORD' => $this->rootPassword,
                 'MYSQL_DATABASE' => $this->database,
@@ -58,10 +61,5 @@ final readonly class MariadbDockerService extends AbstractDatabaseDockerService
                 'MYSQL_PASSWORD' => $this->dbPassword,
             ],
         ];
-    }
-
-    public function getDsnProtocol(): string
-    {
-        return ServiceContainer::MYSQL->value;
     }
 }

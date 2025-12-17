@@ -16,16 +16,34 @@ use Symfony\Component\Filesystem\Filesystem;
 
 final class FolderProjectCreateServiceStepHandler extends AbstractBuildServiceStepHandler
 {
-
     public function __construct(
-        private readonly Filesystem            $filesystem,
+        private readonly Filesystem $filesystem,
         FileSystemEnvironmentServices $fileSystemEnvironmentServices,
-        MercureService                $mercureService,
-        ProcessRunnerService          $processRunner,
-        private readonly string                $projectDir
-    )
-    {
+        MercureService $mercureService,
+        ProcessRunnerService $processRunner,
+        private readonly string $projectDir,
+    ) {
         parent::__construct($fileSystemEnvironmentServices, $mercureService, $processRunner);
+    }
+
+    public function __invoke(AbstractContainer $serviceContainer, Project $project): void
+    {
+        $applicationProjectPath = $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $serviceContainer);
+
+        if (false === $this->fileSystemEnvironmentServices->isDirectoryEmpty($applicationProjectPath)) {
+            $this->mercureService->dispatch(
+                message: \sprintf('Le dossier %s n\'est pas vide, opération annulée', $applicationProjectPath),
+                level: Level::Warning,
+            );
+
+            return;
+        }
+
+        if (!$this->filesystem->exists($applicationProjectPath) && null === $serviceContainer->getGithubRepository()) {
+            $cmd = ['mkdir', '-p', $applicationProjectPath];
+
+            $this->processRunner->run($cmd, '📁 Initialisation du dossier ', $this->projectDir);
+        }
     }
 
     public static function getPriority(): int
@@ -33,32 +51,8 @@ final class FolderProjectCreateServiceStepHandler extends AbstractBuildServiceSt
         return 5;
     }
 
-    public function __invoke(AbstractContainer $serviceContainer, Project $project): void
-    {
-
-        $applicationProjectPath = $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $serviceContainer);
-
-        if ($this->fileSystemEnvironmentServices->isDirectoryEmpty($applicationProjectPath) === false) {
-            $this->mercureService->dispatch(
-                message: sprintf('Le dossier %s n\'est pas vide, opération annulée', $applicationProjectPath),
-                level: Level::Warning
-            );
-            return;
-        }
-
-        if (!$this->filesystem->exists($applicationProjectPath) && null === $serviceContainer->getGithubRepository()) {
-
-            $cmd = ['mkdir', '-p', $applicationProjectPath];
-
-            $this->processRunner->run($cmd, '📁 Initialisation du dossier ', $this->projectDir);
-
-
-        }
-    }
-
     public function getStepName(): ApplicationStep
     {
         return ApplicationStep::INIT_FOLDER_REPOSITORY;
     }
-
 }

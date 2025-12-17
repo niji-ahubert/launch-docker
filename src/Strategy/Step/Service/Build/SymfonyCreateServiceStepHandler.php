@@ -21,20 +21,21 @@ final class SymfonyCreateServiceStepHandler extends AbstractBuildServiceStepHand
         ProcessRunnerService $processRunner,
         private readonly string $hostUid,
         private readonly string $hostGid,
-        private readonly string $projectRoot
+        private readonly string $projectRoot,
     ) {
         parent::__construct($fileSystemEnvironmentServices, $mercureService, $processRunner);
     }
+
     public function __invoke(AbstractContainer $serviceContainer, Project $project): void
     {
-
         $applicationProjectPath = $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $serviceContainer);
 
-        if ($this->fileSystemEnvironmentServices->isDirectoryEmpty($applicationProjectPath) === false) {
+        if (false === $this->fileSystemEnvironmentServices->isDirectoryEmpty($applicationProjectPath)) {
             $this->mercureService->dispatch(
-                message: sprintf('Le dossier %s n\'est pas vide, l\'opération Création du projet Symfony est annulée', $applicationProjectPath),
-                level: Level::Warning
+                message: \sprintf('Le dossier %s n\'est pas vide, l\'opération Création du projet Symfony est annulée', $applicationProjectPath),
+                level: Level::Warning,
             );
+
             return;
         }
 
@@ -42,21 +43,20 @@ final class SymfonyCreateServiceStepHandler extends AbstractBuildServiceStepHand
             'docker',
             'run',
             '--rm',
-              '--user', sprintf('%s:%s', $this->hostUid, $this->hostGid),
-            '--volume', sprintf('%s:/app', str_replace('/var/www/html', $this->projectRoot, $applicationProjectPath)),
+            '--user', \sprintf('%s:%s', $this->hostUid, $this->hostGid),
+            '--volume', \sprintf('%s:/app', str_replace('/var/www/html', $this->projectRoot, $applicationProjectPath)),
             'composer',
             'create-project',
             'symfony/skeleton',
             '.',
-            '--no-interaction'
+            '--no-interaction',
         ];
 
         $this->processRunner->run(
             $command,
             '⚙️ Création du projet Symfony',
-            $applicationProjectPath
+            $applicationProjectPath,
         );
-
     }
 
     public static function getPriority(): int

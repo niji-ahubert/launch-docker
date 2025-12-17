@@ -25,8 +25,7 @@ readonly class ServiceProjectModelToProjectTransformer
         private ContainerServices $containerServices,
         private FrameworkServices $frameworkServices,
         private WebServerServices $webServerServices,
-    )
-    {
+    ) {
     }
 
     public function transform(ServiceProjectModel $model): AbstractContainer
@@ -51,7 +50,6 @@ readonly class ServiceProjectModelToProjectTransformer
             if ($versionFramework instanceof VersionFrameworkSupportedInterface) {
                 $framework->setFrameworkVersion($versionFramework->getValue());
             }
-
         }
 
         $projectContainer->setFolderName($model->getFolderName());
@@ -75,7 +73,7 @@ readonly class ServiceProjectModelToProjectTransformer
         /** @var AbstractContainer $container */
         $container = current(array_filter(
             $containers,
-            static fn(AbstractContainer $container): bool => $container->getId()->toRfc4122() === $uuid,
+            static fn (AbstractContainer $container): bool => $container->getId()->toRfc4122() === $uuid,
         ));
 
         if ($container) {
@@ -94,7 +92,6 @@ readonly class ServiceProjectModelToProjectTransformer
                 if ($framework->getVersionFrameworkEnum() instanceof VersionFrameworkSupportedInterface) {
                     $model->setVersionFramework($framework->getVersionFrameworkEnum());
                 }
-
             }
             $model->setId($container->getId());
             $model->setFolderName($container->getFolderName());

@@ -12,12 +12,11 @@ use Symfony\Component\Filesystem\Filesystem;
 final readonly class DockerComposeFile
 {
     public function __construct(
-        private Filesystem                    $filesystem,
+        private Filesystem $filesystem,
         private FileSystemEnvironmentServices $environmentServices,
-        private DockerComposeFileManipulator  $dockerComposeFileManipulator,
-        private Generator                     $makerGenerator,
-    )
-    {
+        private DockerComposeFileManipulator $dockerComposeFileManipulator,
+        private Generator $makerGenerator,
+    ) {
     }
 
     public function getDockerComposeFile(Project $project, bool $forceCreateNewFile = false): DockerComposeFileManipulator
@@ -25,16 +24,15 @@ final readonly class DockerComposeFile
         $this->environmentServices->loadEnvironments($project);
         $dockerFile = $this->environmentServices->getDockerComposeFilePath($project);
 
-        if ($forceCreateNewFile === false && $this->filesystem->exists($dockerFile)) {
+        if (false === $forceCreateNewFile && $this->filesystem->exists($dockerFile)) {
             return $this->getContentDockerComposeFile($dockerFile);
         }
-        
+
         if ($this->filesystem->exists($dockerFile)) {
             $this->filesystem->remove($dockerFile);
         }
 
         return $this->createDockerComposeFile($dockerFile, $project);
-
     }
 
     private function createDockerComposeFile(string $dockerFile, Project $project): DockerComposeFileManipulator

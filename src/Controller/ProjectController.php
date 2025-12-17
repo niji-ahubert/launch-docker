@@ -24,11 +24,10 @@ use Webmozart\Assert\Assert;
 class ProjectController extends AbstractController
 {
     public function __construct(
-        private readonly FormProjectService            $formProjectService,
+        private readonly FormProjectService $formProjectService,
         private readonly FileSystemEnvironmentServices $fileSystemEnvironmentServices,
-        private readonly TranslatorInterface           $translator,
-    )
-    {
+        private readonly TranslatorInterface $translator,
+    ) {
     }
 
     #[Route('/project/new/{client}', name: 'app_project_new')]
@@ -103,13 +102,13 @@ class ProjectController extends AbstractController
         $token = $request->request->get('_token');
         Assert::string($token);
 
-        if (!$this->isCsrfTokenValid('delete_project_' . $project->getProject(), $token)) {
+        if (!$this->isCsrfTokenValid('delete_project_'.$project->getProject(), $token)) {
             $this->addFlash('error', $this->translator->trans('security.csrf.invalid'));
 
             return $this->redirectToRoute('app_project_list_by_client', ['client' => $project->getClient()]);
         }
 
-        if ($this->formProjectService->loadedProject($project) === false) {
+        if (false === $this->formProjectService->loadedProject($project)) {
             $this->addFlash('error', $this->translator->trans('project.flash.not_found'));
 
             return $this->redirectToRoute('app_project_list_by_client', ['client' => $project->getClient()]);

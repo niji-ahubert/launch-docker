@@ -17,5 +17,4 @@ abstract class AbstractServiceStepHandler extends AbstractStepHandler
      * Exécute l'étape si elle est supportée.
      */
     abstract public function __invoke(AbstractContainer $serviceContainer, Project $project): void;
-
 }

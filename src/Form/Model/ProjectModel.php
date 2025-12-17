@@ -40,7 +40,6 @@ class ProjectModel
         return $this->id;
     }
 
-
     /**
      * @return array<string, string|null>|null
      */

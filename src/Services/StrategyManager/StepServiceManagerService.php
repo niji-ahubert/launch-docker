@@ -22,8 +22,7 @@ final readonly class StepServiceManagerService
     public function __construct(
         #[AutowireIterator(AbstractServiceStepHandler::APP_STEP_HANDLER, defaultPriorityMethod: 'getPriority')]
         private iterable $stepServiceHandlers,
-    )
-    {
+    ) {
     }
 
     /**

@@ -15,17 +15,15 @@ use Monolog\Level;
  */
 final readonly class ServerEventModel
 {
-
     public function __construct(
         private TypeLog $type,
-        private string  $message,
-        private ?Level  $level = null,
-        private ?int    $pid = null,
-        private ?int    $exitCode = null,
+        private string $message,
+        private ?Level $level = null,
+        private ?int $pid = null,
+        private ?int $exitCode = null,
         private ?string $command = null,
         private ?string $error = null,
-    )
-    {
+    ) {
     }
 
     public function getType(): TypeLog
@@ -37,7 +35,6 @@ final readonly class ServerEventModel
     {
         return $this->message;
     }
-
 
     public function getTimestamp(): string
     {

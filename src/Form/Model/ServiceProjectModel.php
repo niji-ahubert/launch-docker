@@ -10,7 +10,6 @@ use App\Enum\Framework\FrameworkLanguageInterface;
 use App\Enum\Framework\FrameworkLanguageNode;
 use App\Enum\Framework\FrameworkLanguagePhp;
 use App\Enum\ServiceVersion\VersionFrameworkSupportedInterface;
-
 use App\Enum\ServiceVersion\VersionLaravelSupported;
 use App\Enum\ServiceVersion\VersionMariadbSupported;
 use App\Enum\ServiceVersion\VersionMysqlSupported;
@@ -58,7 +57,6 @@ class ServiceProjectModel
      */
     private ?FrameworkLanguageInterface $framework = null;
 
-
     /**
      * @phpstan-var VersionServiceSupportedInterface<VersionNodeSupported|VersionMariadbSupported|VersionPhpSupported|VersionMysqlSupported|VersionRedisSupported|VersionPgsqlSupported|VersionNginxSupported>|null
      */
@@ -90,13 +88,13 @@ class ServiceProjectModel
     )]
     private ?WebServer $webServer = null;
 
-//    #[Assert\All([
-//        new Assert\Choice(
-//            callback: [DataStorage::class, 'cases'],
-//            message: 'validator.service.data_storage_choice'
-//        )
-//    ])]
-    /** @var DataStorage[]|null $dataStorages */
+    //    #[Assert\All([
+    //        new Assert\Choice(
+    //            callback: [DataStorage::class, 'cases'],
+    //            message: 'validator.service.data_storage_choice'
+    //        )
+    //    ])]
+    /** @var DataStorage[]|null */
     private ?array $dataStorages = [];
 
     public function __construct()
@@ -104,15 +102,15 @@ class ServiceProjectModel
         $this->id = Uuid::v7();
     }
 
-
     public function getId(): Uuid
     {
         return $this->id;
     }
 
-    public function setId(Uuid $id): ServiceProjectModel
+    public function setId(Uuid $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -130,9 +128,9 @@ class ServiceProjectModel
     public function setDataStorages(?array $dataStorages): self
     {
         $this->dataStorages = $dataStorages;
+
         return $this;
     }
-
 
     /**
      * @phpstan-return VersionServiceSupportedInterface<VersionNodeSupported|VersionMariadbSupported|VersionPhpSupported|VersionMysqlSupported|VersionRedisSupported|VersionPgsqlSupported|VersionNginxSupported>|null
@@ -180,7 +178,6 @@ class ServiceProjectModel
     {
         return $this->language;
     }
-
 
     /**
      * @phpstan-return FrameworkLanguageInterface<FrameworkLanguagePhp|FrameworkLanguageNode>|null

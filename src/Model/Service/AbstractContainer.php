@@ -6,7 +6,6 @@ namespace App\Model\Service;
 
 use App\Enum\ContainerType\ProjectContainer;
 use App\Enum\ContainerType\ServiceContainer;
-
 use App\Enum\DataStorage;
 use App\Enum\ServiceVersion\VersionMariadbSupported;
 use App\Enum\ServiceVersion\VersionMysqlSupported;
@@ -36,8 +35,6 @@ use Symfony\Component\Uid\Uuid;
 )]
 abstract class AbstractContainer implements \Stringable
 {
-    private Uuid $id;
-
     protected ?string $folderName = null;
     protected ProjectContainer|ServiceContainer $serviceContainer;
     protected ?string $dockerServiceName = null;
@@ -57,6 +54,7 @@ abstract class AbstractContainer implements \Stringable
 
     /** @var array<string, string[]>|null */
     protected ?array $extensionsRequired = [];
+    private Uuid $id;
 
     /** @var string[]|null */
     private ?array $extensionContainer = null;
@@ -74,21 +72,21 @@ abstract class AbstractContainer implements \Stringable
         $this->id = Uuid::v7();
     }
 
+    public function __toString(): string
+    {
+        return $this->serviceContainer->value;
+    }
+
     public function getId(): Uuid
     {
         return $this->id;
     }
 
-    public function setId(Uuid $id): AbstractContainer
+    public function setId(Uuid $id): self
     {
         $this->id = $id;
+
         return $this;
-    }
-
-
-    public function __toString(): string
-    {
-        return $this->serviceContainer->value;
     }
 
     /**
@@ -102,12 +100,13 @@ abstract class AbstractContainer implements \Stringable
     /**
      * @param DataStorage[]|null $dataStorages
      */
-    public function setDataStorages(?array $dataStorages): AbstractContainer
+    public function setDataStorages(?array $dataStorages): self
     {
         $this->dataStorages = $dataStorages;
+
         return $this;
     }
-    
+
     abstract public function getFormType(): string;
 
     /**

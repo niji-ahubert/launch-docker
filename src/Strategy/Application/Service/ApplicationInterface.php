@@ -8,11 +8,8 @@ use App\Enum\ApplicationStep;
 use App\Enum\DockerAction;
 use App\Model\Service\AbstractContainer;
 
-
 interface ApplicationInterface
 {
-
-
     /**
      * Retourne la liste des étapes nécessaires pour cette stratégie.
      *

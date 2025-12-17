@@ -9,22 +9,19 @@ use App\Model\Project;
 use App\Model\ServerEventModel;
 use Symfony\Contracts\EventDispatcher\Event;
 
-
 final class ServerEventDispatched extends Event
 {
     public function __construct(
         private readonly ServerEventModel $serverEvent,
-        private readonly Project          $project,
-        private readonly LoggerChannel    $loggerChannel,
-    )
-    {
+        private readonly Project $project,
+        private readonly LoggerChannel $loggerChannel,
+    ) {
     }
 
     public function getServerEvent(): ServerEventModel
     {
         return $this->serverEvent;
     }
-
 
     public function getProject(): Project
     {
@@ -35,6 +32,4 @@ final class ServerEventDispatched extends Event
     {
         return $this->loggerChannel;
     }
-
-
 }

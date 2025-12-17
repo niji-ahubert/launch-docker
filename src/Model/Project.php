@@ -11,6 +11,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 final class Project
 {
     public const string TRAEFIK_NETWORK = 'public-dev';
+
     #[Assert\NotBlank]
     private string $client;
     private string $project;

@@ -14,23 +14,20 @@ final class NpmServiceStepHandler extends AbstractStartServiceStepHandler
 {
     public function __invoke(AbstractContainer $serviceContainer, Project $project): void
     {
-
-
         $this->mercureService->dispatch(
             message: '📦 Configuration des dépendances npm',
-            type: TypeLog::START
+            type: TypeLog::START,
         );
 
         $this->mercureService->dispatch(
-            message: 'Les dépendances npm seront installées lors du build Docker'
+            message: 'Les dépendances npm seront installées lors du build Docker',
         );
 
         $this->mercureService->dispatch(
             message: '✅ Configuration npm préparée',
             type: TypeLog::COMPLETE,
-            exitCode: 0
+            exitCode: 0,
         );
-
     }
 
     public static function getPriority(): int

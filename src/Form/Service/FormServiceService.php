@@ -20,11 +20,10 @@ final readonly class FormServiceService
     public function __construct(
         private FileSystemEnvironmentServices $environmentServices,
         #[AutowireIterator('model_service_service')]
-        private iterable                      $modelServices,
-    )
-    {
+        private iterable $modelServices,
+    ) {
     }
-    
+
     public function getModelOption(TypeService $typeService, Project $project, ?string $uuid = null): FormModel
     {
         return $this->getModelService($typeService)->getModel($project, $uuid);

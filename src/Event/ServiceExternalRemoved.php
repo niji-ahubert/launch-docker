@@ -54,6 +54,7 @@ final class ServiceExternalRemoved extends Event
     public function isWebServerService(): bool
     {
         $webServer = WebServer::tryFrom($this->serviceName);
-        return $webServer !== null && $webServer !== WebServer::LOCAL;
+
+        return null !== $webServer && WebServer::LOCAL !== $webServer;
     }
 }

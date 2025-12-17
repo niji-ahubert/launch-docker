@@ -8,12 +8,11 @@ use App\Enum\ContainerType\ServiceContainer;
 use App\Enum\WebServer;
 use App\Model\Project;
 use App\Model\Service\AbstractContainer;
-use App\Util\DockerComposeUtility;
 use App\Services\FileSystemEnvironmentServices;
+use App\Util\DockerComposeUtility;
 
 final readonly class NginxDockerService extends AbstractDockerService
 {
-    
     public function support(AbstractContainer $service): bool
     {
         return ServiceContainer::NGINX === $service->getServiceContainer();
@@ -31,25 +30,25 @@ final readonly class NginxDockerService extends AbstractDockerService
 
         $serviceSkeleton = [
             'image' => \sprintf('%s:%s', ServiceContainer::NGINX->getValue(), $service->getDockerVersionService()),
-            'container_name' => sprintf('%s_service', ServiceContainer::NGINX->getValue()),
+            'container_name' => \sprintf('%s_service', ServiceContainer::NGINX->getValue()),
             'volumes' => [
-                sprintf('%s:/data', $volumeName),
-                sprintf('%s:/etc/nginx/conf.d/', str_replace(FileSystemEnvironmentServices::PROJECT_IN_GENERATOR_ROOT_DIRECTORY, '${PROJECT_ROOT}/projects', $this->fileSystemEnvironmentServices->getProjectDockerFolderWebserver($project, WebServer::NGINX))),
+                \sprintf('%s:/data', $volumeName),
+                \sprintf('%s:/etc/nginx/conf.d/', str_replace(FileSystemEnvironmentServices::PROJECT_IN_GENERATOR_ROOT_DIRECTORY, '${PROJECT_ROOT}/projects', $this->fileSystemEnvironmentServices->getProjectDockerFolderWebserver($project, WebServer::NGINX))),
                 ...$this->extractProjectVolume($project),
             ],
             'profiles' => ['runner-dev'],
             'networks' => ['traefik'],
         ];
 
-        if ($dependsOn !== []) {
+        if ([] !== $dependsOn) {
             $serviceSkeleton['depends_on'] = $dependsOn;
         }
 
         $serviceSkeleton['labels'] = [
             'traefik.enable=true',
             'traefik.docker.network=public-dev',
-            sprintf('traefik.http.routers.%s-%s-nginx.tls=true', $project->getClient(), $project->getProject()),
-            ...$this->extractUrl($project)
+            \sprintf('traefik.http.routers.%s-%s-nginx.tls=true', $project->getClient(), $project->getProject()),
+            ...$this->extractUrl($project),
         ];
 
         return $serviceSkeleton;
@@ -63,11 +62,10 @@ final readonly class NginxDockerService extends AbstractDockerService
         $volumes = [];
 
         foreach ($project->getServiceContainer() as $container) {
-
             if ($container->getServiceContainer() instanceof ServiceContainer) {
                 continue;
             }
-            $volumes[] = sprintf('%s:%s', str_replace(FileSystemEnvironmentServices::PROJECT_IN_GENERATOR_ROOT_DIRECTORY, '${PROJECT_ROOT}/projects', $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $container)), $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $container));
+            $volumes[] = \sprintf('%s:%s', str_replace(FileSystemEnvironmentServices::PROJECT_IN_GENERATOR_ROOT_DIRECTORY, '${PROJECT_ROOT}/projects', $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $container)), $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $container));
         }
 
         return $volumes;
@@ -84,23 +82,22 @@ final readonly class NginxDockerService extends AbstractDockerService
             if ($container->getServiceContainer() instanceof ServiceContainer) {
                 continue;
             }
-            if ($container->getWebServer()?->getWebServer() === WebServer::NGINX) {
-                $hosts[] = sprintf('Host(`%s`)', $container->getUrlService());
+            if (WebServer::NGINX === $container->getWebServer()?->getWebServer()) {
+                $hosts[] = \sprintf('Host(`%s`)', $container->getUrlService());
             }
         }
 
-        if ($hosts === []) {
+        if ([] === $hosts) {
             return [];
         }
 
         return [
-            sprintf(
+            \sprintf(
                 'traefik.http.routers.%s-%s-nginx.rule=%s',
                 $project->getClient(),
                 $project->getProject(),
-                implode(' || ', $hosts)
-            )
+                implode(' || ', $hosts),
+            ),
         ];
     }
-
 }

@@ -21,29 +21,26 @@ final class FileSystemEnvironmentServices
     public const string DOCKERFILE_NAME = 'LauncherDockerfile';
     public const string DOCKER_COMPOSE_FILE_NAME = 'launcher-docker-compose.yml';
 
-
     public const string PROJECT_IN_GENERATOR_ROOT_DIRECTORY = '/var/www/html/projects';
     public const string NGINX_CONFIG_NAME = 'nginx.conf';
 
     public const string EXT_LOG = '.log';
-    private const string   LOG_FILE_PATTERN = '%s' . self::EXT_LOG;
     public const string  LOGS_FOLDER = 'logs';
     public const string  DOCKER_FOLDER = 'docker';
     public const string SRC_RESOURCES_SKELETON = 'src/Resources/skeleton';
 
-    public const string SRC_RESOURCES_SKELETON_DOCKERFILE = self::SRC_RESOURCES_SKELETON . '/dockerfile';
+    public const string SRC_RESOURCES_SKELETON_DOCKERFILE = self::SRC_RESOURCES_SKELETON.'/dockerfile';
     public const string BIN_ENTRYPOINT_ADDON_SH = 'bin/entrypoint-addon.sh';
+    private const string   LOG_FILE_PATTERN = '%s'.self::EXT_LOG;
     private readonly Finder $finder;
-
     private ?string $pathProject = null;
 
     public function __construct(
-        private readonly Filesystem          $filesystem,
+        private readonly Filesystem $filesystem,
         private readonly SerializerInterface $serializer,
-        private readonly Generator           $makerGenerator,
-        private readonly string              $projectDir,
-    )
-    {
+        private readonly Generator $makerGenerator,
+        private readonly string $projectDir,
+    ) {
         $this->finder = new Finder();
     }
 
@@ -75,7 +72,7 @@ final class FileSystemEnvironmentServices
         }
 
         return array_map(
-            static fn($dir) => $dir->getBasename(),
+            static fn ($dir) => $dir->getBasename(),
             iterator_to_array($this->finder->directories()->in($directory)->depth(0)),
         );
     }
@@ -107,6 +104,7 @@ final class FileSystemEnvironmentServices
     public function getPathProject(Project $projectEnvironment): ?string
     {
         $this->initializePathProject($projectEnvironment);
+
         return $this->pathProject;
     }
 
@@ -122,7 +120,7 @@ final class FileSystemEnvironmentServices
 
     public function createProjectLogsFolder(Project $project): void
     {
-        $this->filesystem->mkdir(sprintf('%s/%s', $this->getPathProject($project), self::LOGS_FOLDER));
+        $this->filesystem->mkdir(\sprintf('%s/%s', $this->getPathProject($project), self::LOGS_FOLDER));
     }
 
     public function createProjectDockerFolder(Project $project): void
@@ -132,12 +130,12 @@ final class FileSystemEnvironmentServices
 
     public function getProjectDockerFolder(Project $project): string
     {
-        return sprintf('%s/%s', $this->getPathProject($project), self::DOCKER_FOLDER);
+        return \sprintf('%s/%s', $this->getPathProject($project), self::DOCKER_FOLDER);
     }
 
     public function getProjectDockerFolderWebserver(Project $project, WebServer $webServer): string
     {
-        return sprintf('%s/%s/%s', $this->getPathProject($project), self::DOCKER_FOLDER, $webServer->getValue());
+        return \sprintf('%s/%s/%s', $this->getPathProject($project), self::DOCKER_FOLDER, $webServer->getValue());
     }
 
     public function createClientFolder(string $clientName): void
@@ -288,12 +286,7 @@ final class FileSystemEnvironmentServices
             return \sprintf('%s/%s', $this->getPathProject($projectEnvironment), self::LOGS_FOLDER);
         }
 
-        return \sprintf('%s/%s/%s', $this->getPathProject($projectEnvironment), self::LOGS_FOLDER, sprintf(self::LOG_FILE_PATTERN, $channel->value));
-    }
-
-    private function initializePathProject(Project $projectEnvironment): void
-    {
-        $this->pathProject = \sprintf('%s/%s', $this->getPathClient($projectEnvironment->getClient()), $projectEnvironment->getProject());
+        return \sprintf('%s/%s/%s', $this->getPathProject($projectEnvironment), self::LOGS_FOLDER, \sprintf(self::LOG_FILE_PATTERN, $channel->value));
     }
 
     public function isDirectoryEmpty(string $directoryPath): bool
@@ -310,12 +303,13 @@ final class FileSystemEnvironmentServices
     public function componentEnvFileExist(Project $projectEnvironment, AbstractContainer $serviceContainer): bool
     {
         $envFile = \sprintf('%s/%s/%s.env', $this->getPathProject($projectEnvironment), self::CONFIG_FOLDER, $serviceContainer->getFolderName());
+
         return $this->filesystem->exists($envFile);
     }
 
     public function composerAlreadyDefined(Project $projectEnvironment, AbstractContainer $serviceContainer): bool
     {
-        return $this->filesystem->exists(sprintf('%s/composer.json', $this->getProjectComponentPath($projectEnvironment, $serviceContainer)));
+        return $this->filesystem->exists(\sprintf('%s/composer.json', $this->getProjectComponentPath($projectEnvironment, $serviceContainer)));
     }
 
     public function getApplicationNginxConfigPath(Project $project, AbstractContainer $serviceContainer): string
@@ -341,5 +335,10 @@ final class FileSystemEnvironmentServices
     public function getSkeletonFile(string $filename): string
     {
         return \sprintf('%s/%s/%s', $this->projectDir, self::SRC_RESOURCES_SKELETON, $filename);
+    }
+
+    private function initializePathProject(Project $projectEnvironment): void
+    {
+        $this->pathProject = \sprintf('%s/%s', $this->getPathClient($projectEnvironment->getClient()), $projectEnvironment->getProject());
     }
 }

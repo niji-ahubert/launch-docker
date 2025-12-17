@@ -20,16 +20,16 @@ final class NodeInitServiceStepHandler extends AbstractBuildServiceStepHandler
     {
         $this->mercureService->dispatch(
             message: ' Création du projet Node.js',
-            type: TypeLog::START
+            type: TypeLog::START,
         );
 
-
         $applicationProjectPath = $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $serviceContainer);
-        if ($this->fileSystemEnvironmentServices->isDirectoryEmpty($applicationProjectPath) === false) {
+        if (false === $this->fileSystemEnvironmentServices->isDirectoryEmpty($applicationProjectPath)) {
             $this->mercureService->dispatch(
-                message: sprintf('Le dossier %s n\'est pas vide, opération annulée', $applicationProjectPath),
-                level: Level::Warning
+                message: \sprintf('Le dossier %s n\'est pas vide, opération annulée', $applicationProjectPath),
+                level: Level::Warning,
             );
+
             return;
         }
 
@@ -47,21 +47,21 @@ final class NodeInitServiceStepHandler extends AbstractBuildServiceStepHandler
             'author' => '',
             'license' => 'ISC',
         ];
-        //TODO pass by write file makeerBundle
-        $packageJsonPath = $applicationProjectPath . \DIRECTORY_SEPARATOR . 'package.json';
+        // TODO pass by write file makeerBundle
+        $packageJsonPath = $applicationProjectPath.\DIRECTORY_SEPARATOR.'package.json';
         file_put_contents($packageJsonPath, json_encode($packageJson, \JSON_THROW_ON_ERROR | \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
-        $indexJsPath = $applicationProjectPath . \DIRECTORY_SEPARATOR . 'index.js';
+        $indexJsPath = $applicationProjectPath.\DIRECTORY_SEPARATOR.'index.js';
         file_put_contents($indexJsPath, "console.log('Hello from Node.js project!');\n");
 
         $this->mercureService->dispatch(
-            message: 'Fichiers créés: package.json, index.js'
+            message: 'Fichiers créés: package.json, index.js',
         );
 
         $this->mercureService->dispatch(
             message: ' Projet Node.js créé avec succès',
             type: TypeLog::COMPLETE,
-            exitCode: 0
+            exitCode: 0,
         );
     }
 

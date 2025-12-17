@@ -12,7 +12,7 @@ use Symfony\Component\Filesystem\Filesystem;
 
 final class PhpQualityServiceStepHandler extends AbstractStartServiceStepHandler
 {
-    public function __construct(private readonly Filesystem            $filesystem)
+    public function __construct(private readonly Filesystem $filesystem)
     {
     }
 
@@ -26,12 +26,11 @@ final class PhpQualityServiceStepHandler extends AbstractStartServiceStepHandler
                 'config',
                 '--no-interaction',
                 $vendor,
-                'true'
+                'true',
             ];
 
             $this->executeInContainer($project, $serviceContainer, $allowPluginCmd, '⚙️ Configuration des plugins Composer');
         }
-
 
         // Then install the packages
         $packagesToInstall = [
@@ -39,12 +38,12 @@ final class PhpQualityServiceStepHandler extends AbstractStartServiceStepHandler
             'friendsofphp/php-cs-fixer',
             'rector/rector',
             'phpstan/extension-installer',
-            'phpro/grumphp'
+            'phpro/grumphp',
         ];
 
         $installCmd = array_merge(
             ['composer', 'require', '--dev', '--no-install'],
-            $packagesToInstall
+            $packagesToInstall,
         );
 
         $this->executeInContainer($project, $serviceContainer, $installCmd, '📦 Ajout des composants de qualités');
@@ -55,29 +54,29 @@ final class PhpQualityServiceStepHandler extends AbstractStartServiceStepHandler
 
         $this->filesystem->copy(
             $this->fileSystemEnvironmentServices->getSkeletonFile('quality/rector/rector.php'),
-            $applicationProjectPath . '/rector.php',
-            true
+            $applicationProjectPath.'/rector.php',
+            true,
         );
 
         $this->filesystem->copy(
             $this->fileSystemEnvironmentServices->getSkeletonFile('quality/phpstan/phpstan.neon'),
-            $applicationProjectPath . '/phpstan.neon',
-            true
+            $applicationProjectPath.'/phpstan.neon',
+            true,
         );
         $this->filesystem->copy(
             $this->fileSystemEnvironmentServices->getSkeletonFile('quality/phpcsfixer/.php-cs-fixer.dist.php'),
-            $applicationProjectPath . '/.php-cs-fixer.dist.php',
-            true
+            $applicationProjectPath.'/.php-cs-fixer.dist.php',
+            true,
         );
         $this->filesystem->copy(
             $this->fileSystemEnvironmentServices->getSkeletonFile('quality/editorconfig/.editorconfig'),
-            $applicationProjectPath . '/.editorconfig',
-            true
+            $applicationProjectPath.'/.editorconfig',
+            true,
         );
         $this->filesystem->copy(
             $this->fileSystemEnvironmentServices->getSkeletonFile('quality/grumphp/grumphp.yml'),
-            $applicationProjectPath . '/grumphp.yml',
-            true
+            $applicationProjectPath.'/grumphp.yml',
+            true,
         );
     }
 

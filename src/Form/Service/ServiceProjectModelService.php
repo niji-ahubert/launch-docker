@@ -18,8 +18,7 @@ final readonly class ServiceProjectModelService
 {
     public function __construct(
         private ServiceProjectModelToProjectTransformer $serviceProjectModelTransformer,
-    )
-    {
+    ) {
     }
 
     public function support(TypeService $typeService): bool
@@ -45,5 +44,4 @@ final readonly class ServiceProjectModelService
     {
         return $this->serviceProjectModelTransformer->transform($model);
     }
-
 }

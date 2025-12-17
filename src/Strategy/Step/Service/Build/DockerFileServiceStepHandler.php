@@ -25,16 +25,13 @@ final class DockerFileServiceStepHandler extends AbstractBuildServiceStepHandler
     private AbstractContainer $currentContainer;
 
     public function __construct(
-        private readonly Filesystem            $filesystem,
+        private readonly Filesystem $filesystem,
         FileSystemEnvironmentServices $fileSystemEnvironmentServices,
-        private readonly Generator             $makerGenerator,
-        private readonly NormalizerInterface   $serializer,
-        MercureService                $mercureService,
-        ProcessRunnerService          $processRunner,
-
-    )
-    {
-
+        private readonly Generator $makerGenerator,
+        private readonly NormalizerInterface $serializer,
+        MercureService $mercureService,
+        ProcessRunnerService $processRunner,
+    ) {
         parent::__construct($fileSystemEnvironmentServices, $mercureService, $processRunner);
     }
 
@@ -48,7 +45,7 @@ final class DockerFileServiceStepHandler extends AbstractBuildServiceStepHandler
         $this->mercureService->initialize($project, LoggerChannel::START);
         $this->mercureService->dispatch(
             message: '🐋 Création du Dockerfile',
-            type: TypeLog::START
+            type: TypeLog::START,
         );
 
         $dockerfilePath = $this->fileSystemEnvironmentServices->getApplicationDockerfilePath($project, $serviceContainer);
@@ -59,12 +56,12 @@ final class DockerFileServiceStepHandler extends AbstractBuildServiceStepHandler
 
         if ($this->filesystem->exists($dockerfilePath)) {
             $this->mercureService->dispatch(
-                message: '📝 Mise à jour du Dockerfile...'
+                message: '📝 Mise à jour du Dockerfile...',
             );
             $this->updateDockerfile($dockerfilePath, $normalizeVar);
         } else {
             $this->mercureService->dispatch(
-                message: '📄 Génération du Dockerfile...'
+                message: '📄 Génération du Dockerfile...',
             );
             $this->makerGenerator->generateFile(
                 targetPath: $dockerfilePath,
@@ -74,14 +71,21 @@ final class DockerFileServiceStepHandler extends AbstractBuildServiceStepHandler
             $this->makerGenerator->writeChanges();
         }
 
-
         $this->mercureService->dispatch(
             message: '✅ Dockerfile généré avec success',
             type: TypeLog::COMPLETE,
-            exitCode: 0
+            exitCode: 0,
         );
+    }
 
+    public static function getPriority(): int
+    {
+        return 1;
+    }
 
+    public function getStepName(): ApplicationStep
+    {
+        return ApplicationStep::DOCKERFILE;
     }
 
     /**
@@ -92,8 +96,8 @@ final class DockerFileServiceStepHandler extends AbstractBuildServiceStepHandler
      * 2. Régénère le Dockerfile depuis le template avec les nouvelles variables
      * 3. Réinjecte le code personnalisé entre les balises dans le nouveau Dockerfile
      *
-     * @param string $dockerfilePath Chemin du Dockerfile à mettre à jour
-     * @param array<string, mixed> $variables Variables pour la génération du template
+     * @param string               $dockerfilePath Chemin du Dockerfile à mettre à jour
+     * @param array<string, mixed> $variables      Variables pour la génération du template
      */
     private function updateDockerfile(string $dockerfilePath, array $variables): void
     {
@@ -104,7 +108,7 @@ final class DockerFileServiceStepHandler extends AbstractBuildServiceStepHandler
         $this->createDockerfile($dockerfilePath, $variables);
 
         // Étape 3 : Réinjecter le code personnalisé si présent
-        if ($customCode !== null) {
+        if (null !== $customCode) {
             $this->injectCustomCode($dockerfilePath, $customCode);
         }
     }
@@ -113,12 +117,13 @@ final class DockerFileServiceStepHandler extends AbstractBuildServiceStepHandler
      * Extrait le code personnalisé entre les balises du Dockerfile.
      *
      * @param string $dockerfilePath Chemin du Dockerfile
+     *
      * @return string|null Le code personnalisé ou null si aucun code trouvé
      */
     private function extractCustomCode(string $dockerfilePath): ?string
     {
         $content = file_get_contents($dockerfilePath);
-        if ($content === false) {
+        if (false === $content) {
             return null;
         }
 
@@ -135,8 +140,8 @@ final class DockerFileServiceStepHandler extends AbstractBuildServiceStepHandler
     /**
      * Crée un nouveau Dockerfile depuis le template.
      *
-     * @param string $dockerfilePath Chemin du Dockerfile à créer
-     * @param array<string, mixed> $variables Variables pour la génération du template
+     * @param string               $dockerfilePath Chemin du Dockerfile à créer
+     * @param array<string, mixed> $variables      Variables pour la génération du template
      */
     private function createDockerfile(string $dockerfilePath, array $variables): void
     {
@@ -144,7 +149,7 @@ final class DockerFileServiceStepHandler extends AbstractBuildServiceStepHandler
         if ($this->filesystem->exists($dockerfilePath)) {
             $this->filesystem->remove($dockerfilePath);
         }
-        
+
         // Génère le nouveau Dockerfile depuis le template
         $this->makerGenerator->generateFile(
             targetPath: $dockerfilePath,
@@ -158,22 +163,22 @@ final class DockerFileServiceStepHandler extends AbstractBuildServiceStepHandler
      * Injecte le code personnalisé entre les balises du Dockerfile.
      *
      * @param string $dockerfilePath Chemin du Dockerfile
-     * @param string $customCode Code personnalisé à injecter
+     * @param string $customCode     Code personnalisé à injecter
      */
     private function injectCustomCode(string $dockerfilePath, string $customCode): void
     {
         $content = file_get_contents($dockerfilePath);
-        if ($content === false) {
+        if (false === $content) {
             return;
         }
 
         // Remplace le contenu vide entre les balises par le code personnalisé
         $pattern = '/(## Custom code Here \.\.\.\s*##)\s*\n\s*(## End Custom code ##)/s';
-        $replacement = "$1\n" . $customCode . "\n$2";
+        $replacement = "$1\n".$customCode."\n$2";
 
         $updatedContent = preg_replace($pattern, $replacement, $content);
 
-        if ($updatedContent !== null) {
+        if (null !== $updatedContent) {
             $this->makerGenerator->dumpFile($dockerfilePath, $updatedContent);
             $this->makerGenerator->writeChanges();
         }
@@ -186,16 +191,4 @@ final class DockerFileServiceStepHandler extends AbstractBuildServiceStepHandler
     {
         return $this->currentContainer;
     }
-
-    public static function getPriority(): int
-    {
-        return 1;
-    }
-
-    public function getStepName(): ApplicationStep
-    {
-        return ApplicationStep::DOCKERFILE;
-    }
-
-
 }

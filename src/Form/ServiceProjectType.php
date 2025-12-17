@@ -88,7 +88,6 @@ class ServiceProjectType extends AbstractType
 
         $project = $options['project'];
         /** @var Project $project */
-
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($project): void {
             $data = $event->getData();
             if (!$data instanceof ServiceProjectModel) {
@@ -98,7 +97,7 @@ class ServiceProjectType extends AbstractType
             $language = $data->getLanguage();
             $framework = $data->getFramework();
             $webserver = $data->getWebServer();
-            $this->addDynamicFields($event->getForm(), $language, $framework, $webserver, $project);
+            $this->addDynamicFields($event->getForm(), $language, $framework, $project);
         });
 
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($project): void {
@@ -110,11 +109,11 @@ class ServiceProjectType extends AbstractType
             $languageValue = $data['language'] ?? null;
             $frameworkValue = $data['framework'] ?? null;
             $webserverValue = $data['webserver'] ?? null;
-            $language = $languageValue ? ProjectContainer::tryFrom((string)$languageValue) : null;
+            $language = $languageValue ? ProjectContainer::tryFrom((string) $languageValue) : null;
             $framework = $frameworkValue ? $this->getFrameworkEnum($language, $frameworkValue) : null;
-            $webserver = $webserverValue ? WebServer::tryFrom((string)$webserverValue) : null;
+            $webserver = $webserverValue ? WebServer::tryFrom((string) $webserverValue) : null;
 
-            $this->addDynamicFields($event->getForm(), $language, $framework, $webserver, $project);
+            $this->addDynamicFields($event->getForm(), $language, $framework, $project);
         });
     }
 
@@ -130,17 +129,15 @@ class ServiceProjectType extends AbstractType
     }
 
     /**
-     * @param FormInterface<ServiceProjectModel> $form
-     * @param FrameworkLanguageInterface<FrameworkLanguagePhp|FrameworkLanguageNode>|null $framework
+     * @param FormInterface<ServiceProjectModel>                                          $form
+     * @param FrameworkLanguageInterface<FrameworkLanguageNode|FrameworkLanguagePhp>|null $framework
      */
     private function addDynamicFields(
-        FormInterface               $form,
-        ?ProjectContainer           $language,
+        FormInterface $form,
+        ?ProjectContainer $language,
         ?FrameworkLanguageInterface $framework,
-        ?WebServer                  $webserver,
-        Project                     $project
-    ): void
-    {
+        Project $project,
+    ): void {
         $this->addVersionServiceField($form, $language);
         $this->addFrameworkField($form, $language);
         $this->addVersionFrameworkField($form, $framework);
@@ -193,8 +190,8 @@ class ServiceProjectType extends AbstractType
     }
 
     /**
-     * @param FormInterface<ServiceProjectModel> $form
-     * @param FrameworkLanguageInterface<FrameworkLanguagePhp|FrameworkLanguageNode>|null $framework
+     * @param FormInterface<ServiceProjectModel>                                          $form
+     * @param FrameworkLanguageInterface<FrameworkLanguageNode|FrameworkLanguagePhp>|null $framework
      */
     private function addVersionFrameworkField(FormInterface $form, ?FrameworkLanguageInterface $framework): void
     {
@@ -226,8 +223,8 @@ class ServiceProjectType extends AbstractType
 
         if (ProjectContainer::PHP === $language) {
             $extensionsChoices = array_combine(
-                array_map(static fn(PhpExtension $case): string => $case->value, PhpExtension::cases()),
-                array_map(static fn(PhpExtension $case): string => $case->value, PhpExtension::cases()),
+                array_map(static fn (PhpExtension $case): string => $case->value, PhpExtension::cases()),
+                array_map(static fn (PhpExtension $case): string => $case->value, PhpExtension::cases()),
             );
         }
 
@@ -267,10 +264,8 @@ class ServiceProjectType extends AbstractType
      */
     private function addDataStorageField(FormInterface $form, Project $project): void
     {
-
         $availableStorages = $this->availableServicesProvider->getAvailableDataStorages($project);
         $choices = $this->availableServicesProvider->formatAsChoices($availableStorages);
-
 
         $form->add('dataStorages', ChoiceType::class, [
             'required' => false,
@@ -286,7 +281,6 @@ class ServiceProjectType extends AbstractType
             ],
         ]);
     }
-
 
     /**
      * @phpstan-return FrameworkLanguagePhp|FrameworkLanguageNode|null

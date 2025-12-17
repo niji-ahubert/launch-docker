@@ -27,8 +27,7 @@ class ServiceExternalType extends AbstractType
 {
     public function __construct(
         private readonly ContainerServices $containerServices,
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -39,7 +38,7 @@ class ServiceExternalType extends AbstractType
                 'required' => true,
                 'choices' => $this->getServiceChoices(),
                 'placeholder' => 'form.service_external.service_name_placeholder',
-                'choice_attr' => fn($choice, $key, $value): array => // Optional: add data attributes for JavaScript use
+                'choice_attr' => fn ($choice, $key, $value): array => // Optional: add data attributes for JavaScript use
                 ['data-service' => $value],
                 'disabled' => $options['is_edit_mode'],
             ])

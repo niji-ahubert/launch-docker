@@ -17,7 +17,7 @@ abstract class AbstractEnvVariableStrategy implements EnvVariableStrategyInterfa
      * Génère les variables d'environnement communes.
      *
      * @param AbstractContainer $serviceContainer Le conteneur de service
-     * @param Project $project Le projet
+     * @param Project           $project          Le projet
      *
      * @return array<string, int|string> Les variables d'environnement communes
      */
@@ -41,7 +41,6 @@ abstract class AbstractEnvVariableStrategy implements EnvVariableStrategyInterfa
             'SHOULD_USE_COMPOSER' => $framework?->isUseComposer() ? 'true' : 'false',
             'FRAMEWORK' => $framework?->getName()->value ?? '',
             'FRAMEWORK_VERSION' => $framework?->getFrameworkVersion() ?? '',
-           
         ];
     }
 }

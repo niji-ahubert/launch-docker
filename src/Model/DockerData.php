@@ -1,25 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Model;
 
 final readonly class DockerData
 {
     public function __construct(
-        private string  $image_name,
-        private string  $tag_version,
-        private string  $from_statement,
+        private string $image_name,
+        private string $tag_version,
+        private string $from_statement,
         private ?string $extensions_selected = null,
-        private ?int    $port = null,
-    )
-    {
-
+        private ?int $port = null,
+    ) {
     }
 
     public function getTagVersion(): string
     {
         return $this->tag_version;
     }
-
 
     public function getPort(): ?int
     {

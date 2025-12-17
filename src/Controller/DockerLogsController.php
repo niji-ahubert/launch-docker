@@ -22,12 +22,11 @@ class DockerLogsController extends AbstractController
     public function __construct(
         private readonly ProjectGenerationService $projectGenerationService,
         private readonly BuildImageProjectService $buildImageProjectService,
-        private readonly StartProjectService      $startProjectService,
-        private readonly StopProjectService       $stopProjectService,
-        private readonly TranslatorInterface      $translator,
-        private readonly DeleteProjectService     $deleteProjectService
-    )
-    {
+        private readonly StartProjectService $startProjectService,
+        private readonly StopProjectService $stopProjectService,
+        private readonly TranslatorInterface $translator,
+        private readonly DeleteProjectService $deleteProjectService,
+    ) {
     }
 
     #[Route('/docker-logs/{action}', name: 'app_docker_logs', methods: ['GET'])]
@@ -37,7 +36,7 @@ class DockerLogsController extends AbstractController
             'project' => $project,
             'client' => $project->getClient(),
             'title' => $action->trans($this->translator),
-            'route' => sprintf('app_docker_logs_%s', $action->value)
+            'route' => \sprintf('app_docker_logs_%s', $action->value),
         ]);
     }
 
@@ -51,9 +50,7 @@ class DockerLogsController extends AbstractController
 
         $this->buildImageProjectService->buildProject($project);
 
-
         return new Response('published!');
-
     }
 
     /**
@@ -64,7 +61,6 @@ class DockerLogsController extends AbstractController
     {
         $this->startProjectService->startProject(project: $project, onlyProjectService: false, detach: true);
         $this->projectGenerationService->executeCreateApplicationService($project, DockerAction::START);
-
 
         return new Response('published!');
     }
@@ -90,5 +86,4 @@ class DockerLogsController extends AbstractController
 
         return $this->redirectToRoute('app_project_list_by_client', ['client' => $project->getClient()]);
     }
-
 }
