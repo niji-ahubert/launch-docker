@@ -37,12 +37,14 @@ final readonly class ProcessRunnerService
             type: TypeLog::START,
         );
 
+        $this->logDebugCommand($command, $env, $applicationProjectPath);
+
         $process = new Process($command, $applicationProjectPath);
         $process->setTimeout(null);
         $process->setIdleTimeout(60);
 
         $process->run(function ($type, $buffer): void {
-            $primaryChunks = preg_split("/(\r\n|\r|\n)/", (string) $buffer) ?: [];
+            $primaryChunks = preg_split("/(\r\n|\r|\n)/", $buffer) ?: [];
 
             foreach ($primaryChunks as $chunk) {
                 $chunk = trim($chunk);
@@ -94,7 +96,7 @@ final readonly class ProcessRunnerService
      */
     private function determineLogLevel(mixed $type, string $message): Level
     {
-        if (Process::ERR === $type || str_contains($message, 'level=error')) {
+        if (str_contains($message, 'level=error')) {
             return Level::Error;
         }
 
@@ -106,6 +108,86 @@ final readonly class ProcessRunnerService
             return Level::Debug;
         }
 
+        if (Process::ERR === $type) {
+            $cleanMessage = trim($message);
+
+            // Mots-clés indiquant un message d'information de Composer
+            $infoKeywords = [
+                'Using version',
+                'has been updated',
+                'Running composer',
+                'Loading composer',
+                'Updating dependencies',
+                'Nothing to modify',
+                'packages you are using are looking for funding',
+                'Use the `composer fund` command',
+                'Extensions installed',
+                'Run composer recipes',
+                'Executing script',
+                '[OK]',
+                'Container',
+                'Network',
+                'Volume',
+                'Creating',
+                'Created',
+                'Starting',
+                'Started',
+                'Stopping',
+                'Stopped',
+                'Removing',
+                'Removed',
+                'Recreating',
+                'Recreated',
+                'Running',
+                'Waiting',
+                'Attaching to',
+                'Image',
+                'Building',
+                'Built',
+            ];
+
+            foreach ($infoKeywords as $keyword) {
+                if (str_contains($cleanMessage, $keyword)) {
+                    return Level::Info;
+                }
+            }
+
+            return Level::Error;
+        }
+
         return Level::Info;
+    }
+
+    /**
+     * Log la commande complète avec les variables d'environnement pour le debugging.
+     *
+     * @param string[]                  $command
+     * @param array<string, int|string> $env
+     */
+    private function logDebugCommand(array $command, array $env, ?string $cwd): void
+    {
+        $envVars = [];
+        foreach ($env as $key => $value) {
+            $envVars[] = \sprintf('%s="%s"', $key, $value);
+        }
+
+        $escapedCommand = array_map(fn (string $arg): string => str_contains($arg, ' ') ? '"'.$arg.'"' : $arg, $command);
+
+        $fullCommand = [];
+        if ([] !== $envVars) {
+            $fullCommand[] = implode(' ', $envVars);
+        }
+        $fullCommand[] = implode(' ', $escapedCommand);
+
+        $debugMessage = \sprintf(
+            "🔍 DEBUG - Commande complète:\n%s\n📁 Working directory: %s",
+            implode(' ', $fullCommand),
+            $cwd ?? getcwd(),
+        );
+
+        $this->mercureService->dispatch(
+            message: $debugMessage,
+            level: Level::Debug,
+        );
     }
 }

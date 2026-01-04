@@ -119,11 +119,13 @@ final readonly class BuildImageProjectService
             $command = ['docker', '--log-level=ERROR', 'compose', '-f', 'docker-compose.admin.yml', '--profile', 'builder', 'build'];
             $command[] = \sprintf('build-php-%s', $project->getEnvironmentContainer()->value);
 
+            $envVars = $this->envFileGeneratorService->generateSocleEnv($service, $project);
+
             $this->processRunnerService->run(
                 $command,
                 'Build common image',
                 $this->projectDir,
-                env: $this->envFileGeneratorService->generateSocleEnv($service, $project),
+                env: $envVars,
             );
         }
 
@@ -140,11 +142,18 @@ final readonly class BuildImageProjectService
             $serviceName,
         ];
 
+        $env = EnvVarUtility::loadEnvironmentVariables($this->fileSystemEnvironmentServices->getComponentEnvFile($project, $service));
+        //specific override to build form socle container
+        $env['WSL_PATH_FOLDER_SOCLE_ROOT'] = FileSystemEnvironmentServices::DOCKER_ROOT_DIRECTORY;
+        $env['PROJECT_ROOT_FOLDER_IN_DOCKER'] = FileSystemEnvironmentServices::PROJECT_ROOT_FOLDER_IN_DOCKER;
+        $env['DOCKER_BUILDKIT'] = '1';
+        $env['COMPOSE_DOCKER_CLI_BUILD'] = '1';
+
         $this->processRunnerService->run(
             $command,
             \sprintf('Build image %s', $serviceName),
             $this->projectDir,
-            env: EnvVarUtility::loadEnvironmentVariables($this->fileSystemEnvironmentServices->getComponentEnvFile($project, $service)),
+            env: $env,
         );
     }
 

@@ -11,27 +11,55 @@ use App\Model\Service\AbstractContainer;
 use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 final class FileSystemEnvironmentServices
 {
     public const string  CONFIG_FOLDER = 'config';
+
     public const string  SOCLE_ENV = 'socle.json';
+
     public const string DOCKERFILE_NAME = 'LauncherDockerfile';
+
     public const string DOCKER_COMPOSE_FILE_NAME = 'launcher-docker-compose.yml';
 
-    public const string PROJECT_IN_GENERATOR_ROOT_DIRECTORY = '/var/www/html/projects';
+    public const string SOCLE_RESOURCES_FOLDER = 'resources';
+
+    public const string SOCLE_RESOURCES_DOCKER_COMPOSE_FOLDER = self::SOCLE_RESOURCES_FOLDER.'/docker-compose';
+
+    public const string SOCLE_RESOURCES_DOCKER_COMPOSE_PATTERN = self::SOCLE_RESOURCES_DOCKER_COMPOSE_FOLDER.'/%s.docker-compose.yml';
+
+    public const string DOCKER_ROOT_DIRECTORY = '/var/www/html';
+
+    public const string PROJECT_ROOT_FOLDER_IN_DOCKER = self::DOCKER_ROOT_DIRECTORY.'/projects';
+
     public const string NGINX_CONFIG_NAME = 'nginx.conf';
 
     public const string EXT_LOG = '.log';
+
     public const string  LOGS_FOLDER = 'logs';
+
     public const string  DOCKER_FOLDER = 'docker';
+
+    public const string  BIN_FOLDER = 'bin';
+
+    public const string  HEALTHCHECK_TRAEFIK_SH = 'healthcheckTraefik.sh';
+
     public const string SRC_RESOURCES_SKELETON = 'src/Resources/skeleton';
 
     public const string SRC_RESOURCES_SKELETON_DOCKERFILE = self::SRC_RESOURCES_SKELETON.'/dockerfile';
+
     public const string BIN_ENTRYPOINT_ADDON_SH = 'bin/entrypoint-addon.sh';
+
+    public const string GITKEEP = '.gitkeep';
+
+    public const string GITIGNORE = '.gitignore';
+
     private const string   LOG_FILE_PATTERN = '%s'.self::EXT_LOG;
+
+    private const string TASKFILE_NAME = 'Taskfile.yml';
     private readonly Finder $finder;
     private ?string $pathProject = null;
 
@@ -72,7 +100,7 @@ final class FileSystemEnvironmentServices
         }
 
         return array_map(
-            static fn ($dir) => $dir->getBasename(),
+            static fn (SplFileInfo $dir) => $dir->getBasename(),
             iterator_to_array($this->finder->directories()->in($directory)->depth(0)),
         );
     }
@@ -115,12 +143,31 @@ final class FileSystemEnvironmentServices
 
     public function getPathClient(string $clientName): string
     {
-        return \sprintf('%s/%s', self::PROJECT_IN_GENERATOR_ROOT_DIRECTORY, $clientName);
+        return \sprintf('%s/%s', self::PROJECT_ROOT_FOLDER_IN_DOCKER, $clientName);
+    }
+
+    public function getRootProjectsPath(): string
+    {
+        return self::PROJECT_ROOT_FOLDER_IN_DOCKER;
     }
 
     public function createProjectLogsFolder(Project $project): void
     {
-        $this->filesystem->mkdir(\sprintf('%s/%s', $this->getPathProject($project), self::LOGS_FOLDER));
+        $logsPath = \sprintf('%s/%s', $this->getPathProject($project), self::LOGS_FOLDER);
+        $this->filesystem->mkdir($logsPath);
+        $this->addGitIgnoreAndKeep($logsPath);
+    }
+
+    public function createProjectBinFolder(Project $project): void
+    {
+        $binPath = \sprintf('%s/%s', $this->getPathProject($project), self::BIN_FOLDER);
+        $this->filesystem->mkdir($binPath);
+
+        $sourceFile = \sprintf('%s/%s/%s', $this->projectDir, self::BIN_FOLDER, self::HEALTHCHECK_TRAEFIK_SH);
+        $destinationFile = \sprintf('%s/%s', $binPath, self::HEALTHCHECK_TRAEFIK_SH);
+
+        $this->filesystem->copy($sourceFile, $destinationFile);
+        $this->filesystem->chmod($destinationFile, 0755);
     }
 
     public function createProjectDockerFolder(Project $project): void
@@ -191,7 +238,7 @@ final class FileSystemEnvironmentServices
             $finder = new Finder();
             $socleFiles = $finder->files()
                 ->name(self::SOCLE_ENV)
-                ->in(self::PROJECT_IN_GENERATOR_ROOT_DIRECTORY);
+                ->in(self::PROJECT_ROOT_FOLDER_IN_DOCKER);
 
             foreach ($socleFiles as $socleFile) {
                 $projectPath = \dirname($socleFile->getPath());
@@ -335,6 +382,38 @@ final class FileSystemEnvironmentServices
     public function getSkeletonFile(string $filename): string
     {
         return \sprintf('%s/%s/%s', $this->projectDir, self::SRC_RESOURCES_SKELETON, $filename);
+    }
+
+    public function getTaskFileSkeletonFile(): string
+    {
+        return \sprintf('%s/%s/%s', $this->projectDir, self::SOCLE_RESOURCES_FOLDER, self::TASKFILE_NAME);
+    }
+
+    public function getParentDockerComposeFile(AbstractContainer $serviceContainer): string
+    {
+        $filename = \sprintf(self::SOCLE_RESOURCES_DOCKER_COMPOSE_PATTERN, $serviceContainer->getServiceContainer()->value);
+
+        return \sprintf('%s/%s', $this->projectDir, $filename);
+    }
+
+    public function getProjectTaskFilePath(Project $project): string
+    {
+        return \sprintf('%s/%s', $this->getPathProject($project), self::TASKFILE_NAME);
+    }
+
+    public function addGitIgnoreAndKeep(string $folderPath): void
+    {
+        $gitIgnoreContent = <<<'EOF'
+# Ignorer tout le contenu du dossier
+*
+# Sauf les fichiers de configuration Git et le keep
+!.gitkeep
+!.gitignore
+
+EOF;
+
+        $this->filesystem->dumpFile(\sprintf('%s/%s', $folderPath, self::GITKEEP), '');
+        $this->filesystem->dumpFile(\sprintf('%s/%s', $folderPath, self::GITIGNORE), $gitIgnoreContent);
     }
 
     private function initializePathProject(Project $projectEnvironment): void
